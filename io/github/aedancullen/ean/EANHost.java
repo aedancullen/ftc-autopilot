@@ -1,4 +1,4 @@
-package io.github.cn04.eanhost;
+package io.github.aedancullen.ean;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -40,10 +40,9 @@ public class EANHost {
     private double[] robotVelocity = new double[3];
     private double[] robotPosition = new double[3];
 
-    public EANHost(double[] initialPosition, Telemetry telemetry, Context appContext) {
+    public EANHost(Telemetry telemetry, Context appContext) {
         this.telemetry = telemetry;
         this.appContext = appContext;
-        robotPosition = initialPosition;
     }
 
     private void telemetryUpdate() {
@@ -61,7 +60,7 @@ public class EANHost {
         return navigationStatus;
     }
 
-    public void setNavigationTarget(PathSegment target) {
+    public void setNavigationTarget(EANSegment target) {
         setNavigationTarget(target.navigationTarget, target.steeringGain, target.accuracyThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown);
     }
 
