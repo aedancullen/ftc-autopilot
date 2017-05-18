@@ -1,4 +1,4 @@
-package io.github.cn04.eanhost;
+package io.github.aedancullen.ean;
 
 import android.content.Context;
 
@@ -20,15 +20,14 @@ public abstract class EANSystem {
     public EANSystem() {}
 	
 	public EANSystem(EANTracker tracker, Telemetry telemetry, Context appContext) {
+		host = new EANHost(telemetry, appContext);
 		this.tracker = tracker;
 		this.telemetry = telemetry;
 		this.appContext = appContext;
 	}
 	
-	public void beginPathTravel(double[] initialPosition, String pathName) throws IOException {
-		host = new EANHost(initialPosition, telemetry, appContext);
+	public void beginPathTravel(String pathName) throws IOException {
 		pathFollower = new PathFollower(pathName, telemetry);
-                host.communicate(tracker);
 	}
 	
 	public abstract void onSegmentTransition(PathSegment previous, PathSegment next, boolean wasOkayToContinue);
