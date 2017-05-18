@@ -28,7 +28,7 @@ public abstract class EANSystem {
 	public void beginPathTravel(double[] initialPosition, String pathName) throws IOException {
 		host = new EANHost(initialPosition, telemetry, appContext);
 		pathFollower = new PathFollower(pathName, telemetry);
-        host.communicate(tracker, true);
+                host.communicate(tracker);
 	}
 	
 	public abstract void onSegmentTransition(PathSegment previous, PathSegment next, boolean wasOkayToContinue);
@@ -40,7 +40,7 @@ public abstract class EANSystem {
                                            double[] robotPosition);
 
     public double[] systemTick() {
-        host.communicate(tracker, false);
+        host.communicate(tracker);
 		
         if (host.getNavigationStatus() == EANHost.ProcessStatus.STOPPED) {
             PathSegment newSegment = pathFollower.moveOnSuccess();
