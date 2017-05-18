@@ -53,7 +53,7 @@ public class EANHost {
                 "\t pos: " + robotPosition[0] + "," + robotPosition[1] + "," + robotPosition[2]);
     }
 	
-    public void communicate(EANTracker tracker, boolean globalRestartOnConnect) {
+    public void communicate(EANTracker tracker) {
     
     }
 
