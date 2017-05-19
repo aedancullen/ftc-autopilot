@@ -43,6 +43,7 @@ public class EANHost {
     public EANHost(Telemetry telemetry, Context appContext) {
         this.telemetry = telemetry;
         this.appContext = appContext;
+	telemetryUpdate();
     }
 
     private void telemetryUpdate() {
@@ -54,7 +55,7 @@ public class EANHost {
     }
 	
     public void communicate(EANTracker tracker) {
-    
+    	telemetryUpdate();
     }
 
     public ProcessStatus getNavigationStatus() {
@@ -63,6 +64,7 @@ public class EANHost {
 	
     public void setNavigationStatus(NavigationStatus navigationStatus) {
 	this.navigationStatus = navigationStatus;
+	telemetryUpdate();
     }
 
     public void setNavigationTarget(EANSegment target) {
@@ -82,6 +84,7 @@ public class EANHost {
         double distY = navigationTarget[1] - robotPosition[1];
         double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
         navigationHalfway = dist / 2;
+	telemetryUpdate();
     }
 
     public double[] getNavigationTarget() {
@@ -109,7 +112,6 @@ public class EANHost {
     }
 
     public double[] navigationTickDifferential() {
-	telemetryUpdate();
 		
         if (
                     hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
@@ -140,5 +142,7 @@ public class EANHost {
             return new double[] {powerLeft, powerRight};
         }
     }
+	
+    telemetryUpdate();
 
 }
