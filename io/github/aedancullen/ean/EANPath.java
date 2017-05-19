@@ -1,4 +1,4 @@
-package io.github.cn04.eanhost;
+package io.github.aedancullen.ean;
 
 import com.qualcomm.robotcore.robocol.Telemetry;
 
