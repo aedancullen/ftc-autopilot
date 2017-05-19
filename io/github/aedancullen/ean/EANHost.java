@@ -49,7 +49,8 @@ public class EANHost {
         telemetry.addData("* EANHost", "\n" +
                 "\t nav: " + navigationStatus.toString().toLowerCase() + "\n" +
                 "\t trg: " + navigationTarget[0] + "," + navigationTarget[1] + "," + navigationTarget[2] + "\n" +
-                "\t pos: " + robotPosition[0] + "," + robotPosition[1] + "," + robotPosition[2]);
+                "\t pos: " + robotPosition[0] + "," + robotPosition[1] + "," + robotPosition[2] + "\n" +
+                "\t att: " + robotAttitude[0] + "," + robotAttitude[1] + "," + robotAttitude[2]);
     }
 	
     public void communicate(EANTracker tracker) {
