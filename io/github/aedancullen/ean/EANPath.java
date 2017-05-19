@@ -94,7 +94,7 @@ public class EANPath {
     }
 
     public EANSegment moveOnSuccess() {
-        telemetryUpdate();
+
         if (currentSegmentId == -1) {
             currentSegmentId = 0;
             EANSegment newCurrent = getSegment(currentSegmentId);
@@ -114,7 +114,7 @@ public class EANPath {
     }
 
     public EANSegment moveOnFailure() {
-        telemetryUpdate();
+
         if (currentSegmentId == -1) {
             currentSegmentId = 0;
             EANSegment newCurrent = getSegment(currentSegmentId);
