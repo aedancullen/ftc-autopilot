@@ -18,9 +18,9 @@ public class EANHost {
     Telemetry telemetry;
     Context appContext;
 
-    public enum ProcessStatus {RUNNING, STOPPED};
+    public enum NavigationStatus {RUNNING, STOPPED};
 
-    private ProcessStatus navigationStatus = ProcessStatus.STOPPED;
+    private NavigationStatus navigationStatus = NavigationStatus.STOPPED;
 
     private double basePower;
     private double lowestPower;
@@ -59,6 +59,10 @@ public class EANHost {
 
     public ProcessStatus getNavigationStatus() {
         return navigationStatus;
+    }
+	
+    public void setNavigationStatus(NavigationStatus navigationStatus) {
+	this.navigationStatus = navigationStatus;
     }
 
     public void setNavigationTarget(EANSegment target) {
@@ -105,7 +109,7 @@ public class EANHost {
     }
 
     public double[] navigationTickDifferential() {
-		telemetryUpdate();
+	telemetryUpdate();
 		
         if (
                     hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
@@ -113,10 +117,10 @@ public class EANHost {
                     hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2])
            )
         {
-            navigationStatus = ProcessStatus.STOPPED;
+            navigationStatus = NavigationStatus.STOPPED;
             return null;
         }
-        else {
+        else if (navigationStatus == NavigationStatus.RUNNING) {
             double distX = navigationTarget[0] - robotPosition[0];
             double distY = navigationTarget[1] - robotPosition[1];
             double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
