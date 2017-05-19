@@ -10,11 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A parser for navigation path files, which reads data about
- * saved routes from external storage.
- * Copyright (c) 2016 Aedan Cullen. All rights reserved.
- */
 
 public class EANPath {
 
@@ -36,7 +31,7 @@ public class EANPath {
             throw new IllegalStateException("Android external storage is not readable");
         }
         String storagePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File pathsLocation = new File(storagePath + "/EAN Autonomous Navigator");
+        File pathsLocation = new File(storagePath + "/EANPaths");
         File pathFile = new File(pathsLocation, pathName);
         try (BufferedReader pathReader = new BufferedReader(new FileReader(pathFile))) {
             String header = pathReader.readLine();
@@ -82,7 +77,7 @@ public class EANPath {
     }
 
     private void telemetryUpdate() {
-        telemetry.addData("* EAN Path Follower", "\n" +
+        telemetry.addData("* EANPath", "\n" +
                 "\t csv: " + pathName + "\n" +
                 "\t cur: " + currentSegmentId + "\n" +
                 "\t suc: " + successSegmentId + "\n" +
