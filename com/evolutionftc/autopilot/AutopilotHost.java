@@ -1,4 +1,4 @@
-package io.github.aedancullen.ean;
+package com.evolutionftc.autopilot;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -47,7 +47,7 @@ public class EANHost {
     }
 
     private void telemetryUpdate() {
-        telemetry.addData("* EANHost", "\n" +
+        telemetry.addData("* AutopilotHost", "\n" +
                 "\t nav: " + navigationStatus.toString().toLowerCase() + "\n" +
                 "\t trg: " + navigationTarget[0] + "," + navigationTarget[1] + "," + navigationTarget[2] + "\n" +
                 "\t pos: " + robotPosition[0] + "," + robotPosition[1] + "," + robotPosition[2] + "\n" +

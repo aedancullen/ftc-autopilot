@@ -1,4 +1,4 @@
-package io.github.aedancullen.ean;
+package com.evolutionftc.autopilot;
 
 import android.content.Context;
 

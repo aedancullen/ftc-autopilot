@@ -1,4 +1,4 @@
-package io.github.aedancullen.ean;
+package com.evolutionftc.autopilot;
 
 import com.qualcomm.robotcore.robocol.Telemetry;
 
@@ -77,7 +77,7 @@ public class EANPath {
     }
 
     private void telemetryUpdate() {
-        telemetry.addData("* EANPath", "\n" +
+        telemetry.addData("* AutopilotPath", "\n" +
                 "\t csv: " + pathName + "\n" +
                 "\t cur: " + currentSegmentId + "\n" +
                 "\t suc: " + successSegmentId + "\n" +

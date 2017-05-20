@@ -1,4 +1,4 @@
-package io.github.aedancullen.ean;
+package com.evolutionftc.autopilot;
 
 
 public class EANSegment {
