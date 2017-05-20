@@ -11,19 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class EANPath {
+public class AutopilotPath {
 
     private Telemetry telemetry;
 
     String pathName;
 
-    private List<EANSegment> pathSegments = new ArrayList<EANSegment>();
+    private List<AutopilotSegment> pathSegments = new ArrayList<AutopilotSegment>();
     private int currentSegmentId = -1;
 
     private int successSegmentId = -1;
     private int failSegmentId = -1;
 
-    public EANPath(String pathName, Telemetry telemetry) {
+    public AutopilotPath(String pathName, Telemetry telemetry) {
         this.telemetry = telemetry;
         this.pathName = pathName;
 		String state = Environment.getExternalStorageState();
@@ -31,7 +31,7 @@ public class EANPath {
             throw new IllegalStateException("Android external storage is not readable");
         }
         String storagePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File pathsLocation = new File(storagePath + "/EANPaths");
+        File pathsLocation = new File(storagePath + "/AutopilotPaths");
         File pathFile = new File(pathsLocation, pathName);
         try (BufferedReader pathReader = new BufferedReader(new FileReader(pathFile))) {
             String header = pathReader.readLine();
@@ -42,7 +42,7 @@ public class EANPath {
 			}
             while (line != null) {
                 String[] lineSegments = line.split(",");
-                EANSegment newSegment = new EANSegment();
+                AutopilotSegment newSegment = new AutopilotSegment();
                 newSegment.id = Integer.valueOf(lineSegments[0]);
                 newSegment.success = Integer.valueOf(lineSegments[1]);
                 newSegment.fail = Integer.valueOf(lineSegments[2]);
@@ -84,8 +84,8 @@ public class EANPath {
                 "\t fai: " + failSegmentId);
     }
 
-    public EANSegment getSegment(int id) {
-        for (EANSegment segment : pathSegments) {
+    public AutopilotSegment getSegment(int id) {
+        for (AutopilotSegment segment : pathSegments) {
             if (segment.id == id) {
                 return segment;
             }
@@ -93,16 +93,16 @@ public class EANPath {
         return null;
     }
 
-    public EANSegment moveOnSuccess() {
+    public AutopilotSegment moveOnSuccess() {
 
         if (currentSegmentId == -1) {
             currentSegmentId = 0;
-            EANSegment newCurrent = getSegment(currentSegmentId);
+            AutopilotSegment newCurrent = getSegment(currentSegmentId);
             successSegmentId = newCurrent.success;
             failSegmentId = newCurrent.fail;
             return newCurrent;
         }
-        EANSegment newCurrent = getSegment(successSegmentId);
+        AutopilotSegment newCurrent = getSegment(successSegmentId);
         if (newCurrent != null) {
             currentSegmentId = successSegmentId;
             successSegmentId = newCurrent.success;
@@ -113,16 +113,16 @@ public class EANPath {
         return null;
     }
 
-    public EANSegment moveOnFailure() {
+    public AutopilotSegment moveOnFailure() {
 
         if (currentSegmentId == -1) {
             currentSegmentId = 0;
-            EANSegment newCurrent = getSegment(currentSegmentId);
+            AutopilotSegment newCurrent = getSegment(currentSegmentId);
             successSegmentId = newCurrent.success;
             failSegmentId = newCurrent.fail;
             return newCurrent;
         }
-        EANSegment newCurrent = getSegment(failSegmentId);
+        AutopilotSegment newCurrent = getSegment(failSegmentId);
         if (newCurrent != null) {
             currentSegmentId = failSegmentId;
             successSegmentId = newCurrent.success;

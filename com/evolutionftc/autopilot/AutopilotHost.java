@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class EANHost {
+public class AutopilotHost {
 
     Telemetry telemetry;
     Context appContext;
@@ -40,7 +40,7 @@ public class EANHost {
     private double[] robotVelocity = new double[3];
     private double[] robotPosition = new double[3];
 
-    public EANHost(Telemetry telemetry, Context appContext) {
+    public AutopilotHost(Telemetry telemetry, Context appContext) {
         this.telemetry = telemetry;
         this.appContext = appContext;
 	telemetryUpdate();
@@ -54,7 +54,7 @@ public class EANHost {
                 "\t att: " + robotAttitude[0] + "," + robotAttitude[1] + "," + robotAttitude[2]);
     }
 	
-    public void communicate(EANTracker tracker) {
+    public void communicate(AutopilotTracker tracker) {
     	telemetryUpdate();
     }
 
@@ -67,7 +67,7 @@ public class EANHost {
 	telemetryUpdate();
     }
 
-    public void setNavigationTarget(EANSegment target) {
+    public void setNavigationTarget(AutopilotSegment target) {
         setNavigationTarget(target.navigationTarget, target.steeringGain, target.accuracyThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown);
     }
 

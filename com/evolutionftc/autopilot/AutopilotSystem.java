@@ -6,21 +6,21 @@ import com.qualcomm.robotcore.robocol.Telemetry;
 import java.io.IOException;
 
 
-public abstract class EANSystem {
+public abstract class AutopilotSystem {
 
 	private Telemetry telemetry;
 	private Context appContext;
-	private EANTracker tracker;
+	private AutopilotTracker tracker;
 	
-	public EANHost host;
+	public AutopilotHost host;
 	public PathFollower pathFollower;
 	
 	private PathSegment currentSegment;
 
-    public EANSystem() {}
+    public AutopilotSystem() {}
 	
-	public EANSystem(EANTracker tracker, Telemetry telemetry, Context appContext) {
-		host = new EANHost(telemetry, appContext);
+	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry, Context appContext) {
+		host = new AutopilotHost(telemetry, appContext);
 		this.tracker = tracker;
 		this.telemetry = telemetry;
 		this.appContext = appContext;
@@ -41,7 +41,7 @@ public abstract class EANSystem {
     public double[] systemTick() {
         host.communicate(tracker);
 		
-        if (host.getNavigationStatus() == EANHost.ProcessStatus.STOPPED) {
+        if (host.getNavigationStatus() == AutopilotHost.ProcessStatus.STOPPED) {
             PathSegment newSegment = pathFollower.moveOnSuccess();
             onSegmentTransition(currentSegment, newSegment, true);
             currentSegment = newSegment;

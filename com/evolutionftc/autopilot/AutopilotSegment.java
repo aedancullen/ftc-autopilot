@@ -1,7 +1,7 @@
 package com.evolutionftc.autopilot;
 
 
-public class EANSegment {
+public class AutopilotSegment {
     public int id;
     public int success;
     public int fail;
