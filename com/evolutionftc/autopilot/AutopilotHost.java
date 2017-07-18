@@ -49,9 +49,9 @@ public class AutopilotHost {
     private void telemetryUpdate() {
         telemetry.addData("* AutopilotHost", "\n" +
                 "\t nav: " + navigationStatus.toString().toLowerCase() + "\n" +
-                "\t trg: " + navigationTarget[0] + "," + navigationTarget[1] + "," + navigationTarget[2] + "\n" +
-                "\t pos: " + robotPosition[0] + "," + robotPosition[1] + "," + robotPosition[2] + "\n" +
-                "\t att: " + robotAttitude[0] + "," + robotAttitude[1] + "," + robotAttitude[2]);
+                "\t trg: " + round(navigationTarget[0]) + "," + round(navigationTarget[1]) + "," + round(navigationTarget[2]) + "\n" +
+                "\t pos: " + round(robotPosition[0]) + "," + round(robotPosition[1]) + "," + round(robotPosition[2]) + "\n" +
+                "\t att: " + round(robotAttitude[0]) + "," + round(robotAttitude[1]) + "," + round(robotAttitude[2]);
     }
 	
     public void communicate(AutopilotTracker tracker) {
@@ -111,6 +111,11 @@ public class AutopilotHost {
         return (Math.abs(param2 - param1) < threshold);
     }
 
+    private static double round(double in) {
+        double roundOff = (double) Math.round(in * 100) / 100;
+        return roundOff
+    }
+
     public double[] navigationTickDifferential() {
 		
         if (
@@ -136,13 +141,14 @@ public class AutopilotHost {
             else if (powerAdj < 0 && rampDown) {
                 powerAdj *= -1;
             }
-            double angle = Math.toDegrees(Math.atan(distY / distX));
-            double powerLeft = Math.max((basePower - powerAdj), lowestPower) + (angle * steeringGain);
-            double powerRight = Math.max((basePower - powerAdj), lowestPower) - (angle * steeringGain);
+            double angle = Math.atan(distY / distX) - robotAttitude[3];
+            double powerLeft = Math.max((basePower - powerAdj), lowestPower) - (angle * steeringGain);
+            double powerRight = Math.max((basePower - powerAdj), lowestPower) + (angle * steeringGain);
             return new double[] {powerLeft, powerRight};
         }
+
+        telemetryUpdate();
+
     }
-	
-    telemetryUpdate();
 
 }
