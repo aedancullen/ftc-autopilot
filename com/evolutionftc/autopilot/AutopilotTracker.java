@@ -6,6 +6,8 @@ public class AutopilotTracker {
 	private DcMotor left;
 	private DcMotor right;
 
+	private IMUTHINGY imu;
+
 	private double[] robotAttitude = new double[3];
 
     private double[] robotAcceleration = new double[3];
@@ -88,26 +90,37 @@ public class AutopilotTracker {
     }
 
 
-	public AutopilotTracker(DcMotor left, DcMotor right) {
+	public AutopilotTracker(DcMotor left, DcMotor right, IMUTHINGY imu) {
         this.left = left;
         this.right = right;
+        this.imu = imu;
     }
 
 
 	public double[] getRobotAttitude() {
-        
+        return imu.GETHPRSOMEHOW()
     }
 
     public double[] getRobotAcceleration() {
-        
+        // not todai, boi
     }
 
     public double[] getRobotVelocity() {
-
+    	// not todai, boi
     }
 
     public double[] getRobotPosition() {
 
+    	double yval = (right.ENCODERSOMEHOW() + left.ENCODERSOMEHOW()) / 2.0;
+
+    	// reset encoder somehow??
+
+    	double[] translation = {0.0, yval, 0.0};
+
+    	// isn't this so noice and clean
+    	robotPosition = transform(robotPosition, translation, imu.GETHPRSOMEHOW());
+
+    	return robotPosition;
     }
 
 }
