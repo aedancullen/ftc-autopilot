@@ -20,9 +20,9 @@ public abstract class AutopilotSystem {
 	private AutopilotTracker tracker;
 	
 	public AutopilotHost host;
-	public PathFollower pathFollower;
+	public AutopilotPath pathFollower;
 	
-	private PathSegment currentSegment;
+	private AutopilotSegment currentSegment;
 
     public AutopilotSystem() {}
 	
@@ -34,12 +34,12 @@ public abstract class AutopilotSystem {
 	}
 	
 	public void beginPathTravel(String pathName) throws IOException {
-		pathFollower = new PathFollower(pathName, telemetry);
+		pathFollower = new AutopilotPath(pathName, telemetry);
 	}
 	
-	public abstract void onSegmentTransition(PathSegment previous, PathSegment next, boolean wasOkayToContinue);
+	public abstract void onSegmentTransition(AutopilotSegment previous, AutopilotSegment next, boolean wasOkayToContinue);
 	
-	public abstract boolean shouldContinue(PathSegment segment,
+	public abstract boolean shouldContinue(AutopilotSegment segment,
                                            double[] robotAttitude,
                                            double[] robotAcceleration,
                                            double[] robotVelocity,
@@ -49,7 +49,7 @@ public abstract class AutopilotSystem {
         host.communicate(tracker);
 		
         if (host.getNavigationStatus() == AutopilotHost.ProcessStatus.STOPPED) {
-            PathSegment newSegment = pathFollower.moveOnSuccess();
+            AutopilotSegment newSegment = pathFollower.moveOnSuccess();
             onSegmentTransition(currentSegment, newSegment, true);
             currentSegment = newSegment;
             if (currentSegment != null) {
@@ -65,7 +65,7 @@ public abstract class AutopilotSystem {
                                 host.getRobotVelocity(),
                                 host.getRobotPosition()) == false)
         {
-            PathSegment newSegment = pathFollower.moveOnFailure();
+            AutopilotSegment newSegment = pathFollower.moveOnFailure();
             onSegmentTransition(currentSegment, newSegment, false);
             currentSegment = newSegment;
             if (currentSegment != null) {
