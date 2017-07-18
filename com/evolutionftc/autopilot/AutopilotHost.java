@@ -135,7 +135,7 @@ public class AutopilotHost {
            )
         {
             navigationStatus = NavigationStatus.STOPPED;
-            return null;
+            return new double[2];
         }
         else if (navigationStatus == NavigationStatus.RUNNING) {
             double distX = navigationTarget[0] - robotPosition[0];
