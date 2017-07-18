@@ -55,7 +55,10 @@ public class AutopilotHost {
     }
 	
     public void communicate(AutopilotTracker tracker) {
-    	telemetryUpdate();
+    	robotAttitude = tracker.getRobotAttitude()
+        robotAcceleration = tracker.getRobotAcceleration()
+        robotVelocity = tracker.getRobotVelocity()
+        robotPosition = tracker.getRobotPosition()
     }
 
     public ProcessStatus getNavigationStatus() {

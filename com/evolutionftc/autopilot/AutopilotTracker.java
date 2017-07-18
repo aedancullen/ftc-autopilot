@@ -13,6 +13,81 @@ public class AutopilotTracker {
     private double[] robotPosition = new double[3];
 
 
+    private static double[][] matmul(double[][] firstarray, double[][] secondarray) {
+
+        double [][] result = new double[firstarray.length][secondarray[0].length];
+
+		/* Loop through each and get product, then sum up and store the value */
+		for (int i = 0; i < firstarray.length; i++) { 
+    		for (int j = 0; j < secondarray[0].length; j++) { 
+        		for (int k = 0; k < firstarray[0].length; k++) { 
+            		result[i][j] += firstarray[i][k] * secondarray[k][j];
+        		}
+    		}
+		}
+
+		return result;
+    }
+
+    private static double[][] buildTransform(double[] xyz, double[] hpr){
+
+    	// See http://planning.cs.uiuc.edu/node104.html
+
+    	double[][] out = new double[4][4];
+
+    	double x = xyz[0];
+  		double y = xyz[1];
+  		double z = xyz[2];
+  		double h = hpr[0];
+  		double p = hpr[1];
+  		double r = hpr[2];
+
+
+  		out[0][0] = Math.cos(h)*Math.cos(p);
+  		out[0][1] = (Math.cos(h)*Math.sin(p)*Math.sin(r)) - (Math.sin(h)*Math.cos(r));
+  		out[0][2] = (Math.cos(h)*Math.sin(p)*Math.cos(r)) + (Math.sin(h)*Math.sin(r));
+  		out[0][3] = x;
+  		out[1][0] = Math.sin(h)*Math.cos(p);
+  		out[1][1] = (Math.sin(h)*Math.sin(p)*Math.sin(r)) + (Math.cos(h)*Math.cos(r));
+  		out[1][2] = (Math.sin(h)*Math.sin(p)*Math.cos(r)) - (Math.cos(h)*Math.sin(r));
+  		out[1][3] = y;
+  		out[2][0] = -Math.sin(p);
+  		out[2][1] = Math.cos(p)*Math.sin(r);
+  		out[2][2] = Math.cos(p)*Math.cos(r);
+  		out[2][3] = z;
+  		out[3][0] = 0.0;
+  		out[3][1] = 0.0;
+  		out[3][2] = 0.0;
+  		out[3][3] = 1.0;
+
+  		return out;
+    }
+
+    private static double[] transform(double[] point, double[] translation, double[] rotation) {
+
+    	// Transform a 3D body by rotation and then translation. See http://planning.cs.uiuc.edu/node104.html
+
+    	double[][] transform = buildTransform(point, rotation);
+
+    	double[][] params = {
+        {translation[0]},
+        {translation[1]},
+        {translation[2]},
+        {1.0}
+      	};
+
+      	double[][] result = matmul(transform, params);
+
+      	double[] out = new double[3];
+
+      	out[0] = result[0][0];
+  		out[1] = result[1][0];
+  		out[2] = result[2][0];
+
+  		return out;
+    }
+
+
 	public AutopilotTracker(DcMotor left, DcMotor right) {
         this.left = left;
         this.right = right;
