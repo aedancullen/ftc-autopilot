@@ -13,6 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 
 
+// this is a snazzy autopilot for ftc made by aedan.
+// it was made somewhat for team #9867, 'evolution'
+// it uses lots of maths.
+// it is gpl licensed.
+// copyright 2017 aedan cullen.
+
+
 public class AutopilotHost {
 
     Telemetry telemetry;
