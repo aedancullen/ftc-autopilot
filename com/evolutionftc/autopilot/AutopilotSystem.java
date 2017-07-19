@@ -48,7 +48,7 @@ public abstract class AutopilotSystem {
     public double[] systemTick() {
         host.communicate(tracker);
 
-        host.navigationTickDifferential();
+        res = host.navigationTickDifferential();
 		
         if (host.getNavigationStatus() == AutopilotHost.ProcessStatus.STOPPED) {
             AutopilotSegment newSegment = pathFollower.moveOnSuccess();
@@ -78,6 +78,9 @@ public abstract class AutopilotSystem {
             else {
                 return new double[2];
             }
+        }
+        else {
+            return res
         }
 
     }
