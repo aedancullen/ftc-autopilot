@@ -24,10 +24,10 @@ public class AutopilotPath {
     String pathName;
 
     private List<AutopilotSegment> pathSegments = new ArrayList<AutopilotSegment>();
-    private int currentSegmentId = -1;
+    private String currentSegmentId = "NOTHINGNOTHINGNOTHING";
 
-    private int successSegmentId = -1;
-    private int failSegmentId = -1;
+    private String successSegmentId = "NOTHINGNOTHINGNOTHING";
+    private String failSegmentId = "NOTHINGNOTHINGNOTHING";
 
     public AutopilotPath(String pathName, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -49,9 +49,9 @@ public class AutopilotPath {
             while (line != null) {
                 String[] lineSegments = line.split(",");
                 AutopilotSegment newSegment = new AutopilotSegment();
-                newSegment.id = Integer.valueOf(lineSegments[0]);
-                newSegment.success = Integer.valueOf(lineSegments[1]);
-                newSegment.fail = Integer.valueOf(lineSegments[2]);
+                newSegment.id = lineSegments[0];
+                newSegment.success = lineSegments[1];
+                newSegment.fail = lineSegments[2];
                 newSegment.navigationTarget = new double[] {
                                 Double.valueOf(lineSegments[3]),
                                 Double.valueOf(lineSegments[4]),
@@ -90,9 +90,9 @@ public class AutopilotPath {
                 "\t fai: " + failSegmentId);
     }
 
-    public AutopilotSegment getSegment(int id) {
+    public AutopilotSegment getSegment(String id) {
         for (AutopilotSegment segment : pathSegments) {
-            if (segment.id == id) {
+            if (segment.id.equals(id)) {
                 return segment;
             }
         }
@@ -101,8 +101,8 @@ public class AutopilotPath {
 
     public AutopilotSegment moveOnSuccess() {
 
-        if (currentSegmentId == -1) {
-            currentSegmentId = 0;
+        if (currentSegmentId.equals("NOTHINGNOTHINGNOTHING")) {
+            currentSegmentId = "__start__";
             AutopilotSegment newCurrent = getSegment(currentSegmentId);
             successSegmentId = newCurrent.success;
             failSegmentId = newCurrent.fail;
@@ -121,8 +121,8 @@ public class AutopilotPath {
 
     public AutopilotSegment moveOnFailure() {
 
-        if (currentSegmentId == -1) {
-            currentSegmentId = 0;
+        if (currentSegmentId.equals("NOTHINGNOTHINGNOTHING")) {
+            currentSegmentId = "__start__";
             AutopilotSegment newCurrent = getSegment(currentSegmentId);
             successSegmentId = newCurrent.success;
             failSegmentId = newCurrent.fail;

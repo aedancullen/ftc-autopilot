@@ -9,9 +9,9 @@ package com.evolutionftc.autopilot;
 
 
 public class AutopilotSegment {
-    public int id;
-    public int success;
-    public int fail;
+    public String id;
+    public String success;
+    public String fail;
 
     public double[] navigationTarget;
     public double steeringGain;
