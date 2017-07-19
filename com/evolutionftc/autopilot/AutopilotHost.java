@@ -1,16 +1,9 @@
 package com.evolutionftc.autopilot;
 
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbManager;
 
-import com.qualcomm.robotcore.robocol.Telemetry;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 
 
 // this is a snazzy autopilot for ftc made by aedan.
@@ -23,7 +16,6 @@ import java.util.List;
 public class AutopilotHost {
 
     Telemetry telemetry;
-    Context appContext;
 
     public enum NavigationStatus {RUNNING, STOPPED};
 
@@ -43,13 +35,10 @@ public class AutopilotHost {
 
     private double[] robotAttitude = new double[3];
 
-    private double[] robotAcceleration = new double[3];
-    private double[] robotVelocity = new double[3];
     private double[] robotPosition = new double[3];
 
-    public AutopilotHost(Telemetry telemetry, Context appContext) {
+    public AutopilotHost(Telemetry telemetry) {
         this.telemetry = telemetry;
-        this.appContext = appContext;
 	telemetryUpdate();
     }
 
@@ -58,18 +47,16 @@ public class AutopilotHost {
                 "\t nav: " + navigationStatus.toString().toLowerCase() + "\n" +
                 "\t trg: " + round(navigationTarget[0]) + "," + round(navigationTarget[1]) + "," + round(navigationTarget[2]) + "\n" +
                 "\t pos: " + round(robotPosition[0]) + "," + round(robotPosition[1]) + "," + round(robotPosition[2]) + "\n" +
-                "\t att: " + round(robotAttitude[0]) + "," + round(robotAttitude[1]) + "," + round(robotAttitude[2]);
+                "\t att: " + round(robotAttitude[0]) + "," + round(robotAttitude[1]) + "," + round(robotAttitude[2]));
     }
 	
     public void communicate(AutopilotTracker tracker) {
         tracker.setRobotPosition(robotPosition);
-    	robotAttitude = tracker.getRobotAttitude()
-        robotAcceleration = tracker.getRobotAcceleration()
-        robotVelocity = tracker.getRobotVelocity()
-        robotPosition = tracker.getRobotPosition()
+    	robotAttitude = tracker.getRobotAttitude();
+        robotPosition = tracker.getRobotPosition();
     }
 
-    public ProcessStatus getNavigationStatus() {
+    public NavigationStatus getNavigationStatus() {
         return navigationStatus;
     }
 	
@@ -120,10 +107,12 @@ public class AutopilotHost {
 
     private static double round(double in) {
         double roundOff = (double) Math.round(in * 100) / 100;
-        return roundOff
+        return roundOff;
     }
 
     public double[] navigationTickDifferential() {
+
+        telemetryUpdate();
 		
         if (
                     hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
@@ -154,7 +143,9 @@ public class AutopilotHost {
             return new double[] {powerLeft, powerRight};
         }
 
-        telemetryUpdate();
+        else {
+            return new double[2];
+        }
 
     }
 

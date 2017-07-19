@@ -1,8 +1,8 @@
 package com.evolutionftc.autopilot;
 
-import android.content.Context;
 
-import com.qualcomm.robotcore.robocol.Telemetry;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.io.IOException;
 
 
@@ -16,7 +16,6 @@ import java.io.IOException;
 public abstract class AutopilotSystem {
 
 	private Telemetry telemetry;
-	private Context appContext;
 	private AutopilotTracker tracker;
 	
 	public AutopilotHost host;
@@ -26,11 +25,10 @@ public abstract class AutopilotSystem {
 
     public AutopilotSystem() {}
 	
-	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry, Context appContext) {
-		host = new AutopilotHost(telemetry, appContext);
+	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry) {
+		host = new AutopilotHost(telemetry);
 		this.tracker = tracker;
 		this.telemetry = telemetry;
-		this.appContext = appContext;
 	}
 	
 	public void beginPathTravel(String pathName) throws IOException {
@@ -41,16 +39,14 @@ public abstract class AutopilotSystem {
 	
 	public abstract boolean shouldContinue(AutopilotSegment segment,
                                            double[] robotAttitude,
-                                           double[] robotAcceleration,
-                                           double[] robotVelocity,
                                            double[] robotPosition);
 
     public double[] systemTick() {
         host.communicate(tracker);
 
-        res = host.navigationTickDifferential();
+        double[] res = host.navigationTickDifferential();
 		
-        if (host.getNavigationStatus() == AutopilotHost.ProcessStatus.STOPPED) {
+        if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
             AutopilotSegment newSegment = pathFollower.moveOnSuccess();
             onSegmentTransition(currentSegment, newSegment, true);
             currentSegment = newSegment;
@@ -64,8 +60,6 @@ public abstract class AutopilotSystem {
         }
         else if (shouldContinue(currentSegment,
                                 host.getRobotAttitude(),
-                                host.getRobotAcceleration(),
-                                host.getRobotVelocity(),
                                 host.getRobotPosition()) == false)
         {
             AutopilotSegment newSegment = pathFollower.moveOnFailure();
@@ -80,7 +74,7 @@ public abstract class AutopilotSystem {
             }
         }
         else {
-            return res
+            return res;
         }
 
     }

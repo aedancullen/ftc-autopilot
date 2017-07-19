@@ -1,8 +1,11 @@
 package com.evolutionftc.autopilot;
 
-import com.qualcomm.robotcore.robocol.Telemetry;
+
 
 import android.os.Environment;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

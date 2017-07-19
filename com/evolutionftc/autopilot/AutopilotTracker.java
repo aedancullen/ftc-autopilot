@@ -8,10 +8,15 @@ package com.evolutionftc.autopilot;
 // copyright 2017 aedan cullen.
 
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 public class AutopilotTracker {
 
 	private DcMotor left;
 	private DcMotor right;
+
+	long lenc;
+	long renc;
 
 	private IMUTHINGY imu;
   
@@ -107,9 +112,10 @@ public class AutopilotTracker {
 
     public double[] getRobotPosition() {
 
-    	double yval = (right.ENCODERSOMEHOW() + left.ENCODERSOMEHOW()) / 2.0;
+    	double yval = (right.getCurrentPosition() - renc + left.getCurrentPosition() - lenc) / 2.0;
 
-    	// reset encoder somehow??
+    	renc = right.getTargetPosition();
+		lenc = left.getCurrentPosition();
 
     	double[] translation = {0.0, yval, 0.0};
 
