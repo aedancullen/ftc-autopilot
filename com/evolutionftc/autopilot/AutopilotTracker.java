@@ -14,11 +14,7 @@ public class AutopilotTracker {
 	private DcMotor right;
 
 	private IMUTHINGY imu;
-
-	private double[] robotAttitude = new double[3];
-
-    private double[] robotAcceleration = new double[3];
-    private double[] robotVelocity = new double[3];
+  
     private double[] robotPosition = new double[3];
 
 
@@ -108,13 +104,6 @@ public class AutopilotTracker {
         return imu.GETHPRSOMEHOW()
     }
 
-    public double[] getRobotAcceleration() {
-        // not todai, boi
-    }
-
-    public double[] getRobotVelocity() {
-    	// not todai, boi
-    }
 
     public double[] getRobotPosition() {
 
@@ -128,6 +117,10 @@ public class AutopilotTracker {
     	robotPosition = transform(robotPosition, translation, imu.GETHPRSOMEHOW());
 
     	return robotPosition;
+    }
+
+    public void setRobotPosition(double[] position) {
+      robotPosition = position;
     }
 
 }
