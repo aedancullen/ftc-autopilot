@@ -103,6 +103,7 @@ public class AutopilotPath {
     }
 
     public AutopilotSegment moveOnSuccess() {
+        telemetryUpdate();
 
         if (currentSegmentId.equals("NOTHINGNOTHINGNOTHING")) {
             currentSegmentId = "__start__";
@@ -118,11 +119,12 @@ public class AutopilotPath {
             failSegmentId = newCurrent.fail;
             return newCurrent;
         }
-        telemetryUpdate();
+        
         return null;
     }
 
     public AutopilotSegment moveOnFailure() {
+        telemetryUpdate();
 
         if (currentSegmentId.equals("NOTHINGNOTHINGNOTHING")) {
             currentSegmentId = "__start__";
@@ -138,7 +140,7 @@ public class AutopilotPath {
             failSegmentId = newCurrent.fail;
             return newCurrent;
         }
-        telemetryUpdate();
+
         return null;
     }
 
