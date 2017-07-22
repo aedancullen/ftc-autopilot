@@ -8,7 +8,13 @@ package com.evolutionftc.autopilot;
 // copyright 2017 aedan cullen.
 
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public class AutopilotTracker {
 
@@ -18,7 +24,7 @@ public class AutopilotTracker {
 	long lenc;
 	long renc;
 
-	private IMUTHINGY imu;
+	private BNO055IMU imu;
   
     private double[] robotPosition = new double[3];
 
@@ -27,7 +33,6 @@ public class AutopilotTracker {
 
         double [][] result = new double[firstarray.length][secondarray[0].length];
 
-		/* Loop through each and get product, then sum up and store the value */
 		for (int i = 0; i < firstarray.length; i++) { 
     		for (int j = 0; j < secondarray[0].length; j++) { 
         		for (int k = 0; k < firstarray[0].length; k++) { 
@@ -98,15 +103,23 @@ public class AutopilotTracker {
     }
 
 
-	public AutopilotTracker(DcMotor left, DcMotor right, IMUTHINGY imu) {
+	public AutopilotTracker(DcMotor left, DcMotor right, BNO055IMU imu) {
         this.left = left;
         this.right = right;
         this.imu = imu;
+
+		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+		parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
+
+		imu.initialize(parameters);
     }
 
 
 	public double[] getRobotAttitude() {
-        return imu.GETHPRSOMEHOW()
+		// All of this AxisReference, AxesOrder and AngleUnit rubbish is overcomplicated garbage and has no reason to exist.
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+		double[] out = {angles.firstAngle, angles.secondAngle, angles.thirdAngle};
+		return out;
     }
 
 
@@ -119,9 +132,8 @@ public class AutopilotTracker {
 
     	double[] translation = {0.0, yval, 0.0};
 
-    	// isn't this so noice and clean
-    	robotPosition = transform(robotPosition, translation, imu.GETHPRSOMEHOW());
-
+    	// isn't this so noice and clean, unlike the ftc_app api
+    	robotPosition = transform(robotPosition, translation, getRobotAttitude());
     	return robotPosition;
     }
 
