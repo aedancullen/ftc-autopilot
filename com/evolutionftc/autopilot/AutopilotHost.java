@@ -137,10 +137,28 @@ public class AutopilotHost {
             else if (powerAdj < 0 && rampDown) {
                 powerAdj *= -1;
             }
-            double angle = Math.atan(distY / distX) - robotAttitude[3];
-            double powerLeft = Math.max((basePower - powerAdj), lowestPower) - (angle * steeringGain);
-            double powerRight = Math.max((basePower - powerAdj), lowestPower) + (angle * steeringGain);
-            return new double[] {powerLeft, powerRight};
+            double angle = (Math.atan(distY / distX) - Math.PI / 2) - robotAttitude[3];
+            if (angle > Math.PI) {
+                angle = -angle - Math.PI;
+            }
+            if (Math.abs(angle) < Math.PI / 2) { // Drive forward
+                double powerLeft = Math.max((basePower - powerAdj), lowestPower) - (angle * steeringGain);
+                double powerRight = Math.max((basePower - powerAdj), lowestPower) + (angle * steeringGain);
+                return new double[]{powerLeft, powerRight};
+            }
+            else {
+                // Calculate the angle with respect to the back of the robot.
+                if (angle > 0) {
+                    angle = Math.PI - angle;
+                }
+                else{
+                    angle = -Math.PI - angle;
+                }
+                // Drive backward
+                double powerLeft = Math.max((-basePower - powerAdj), lowestPower) - (angle * steeringGain);
+                double powerRight = Math.max((-basePower - powerAdj), lowestPower) + (angle * steeringGain);
+                return new double[]{powerLeft, powerRight};
+            }
         }
 
         else {
