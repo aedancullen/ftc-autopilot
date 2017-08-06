@@ -23,6 +23,7 @@ public class AutopilotTracker {
 
 	long lenc;
 	long renc;
+	long ticksPerUnit;
 
 	private BNO055IMU imu;
   
@@ -103,10 +104,11 @@ public class AutopilotTracker {
     }
 
 
-	public AutopilotTracker(DcMotor left, DcMotor right, BNO055IMU imu) {
+	public AutopilotTracker(DcMotor left, DcMotor right, long ticksperUnit, BNO055IMU imu) {
         this.left = left;
         this.right = right;
         this.imu = imu;
+	this.ticksPerUnit = ticksPerUnit;
 
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
@@ -125,9 +127,12 @@ public class AutopilotTracker {
 
     public double[] getRobotPosition() {
 
-    	double yval = (right.getCurrentPosition() - renc + left.getCurrentPosition() - lenc) / 2.0;
+	long ticksRight = right.getCurrentPosition() / ticksPerUnit;
+	long ticksLeft = left.getCurrentPosition() / ticksPerUnit;
+	    
+    	double yval = (ticksRight - renc + ticksLeft - lenc) / 2.0;
 
-    	renc = right.getTargetPosition();
+    	renc = right.getCurrentPosition();
 		lenc = left.getCurrentPosition();
 
     	double[] translation = {0.0, yval, 0.0};
