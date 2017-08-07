@@ -139,7 +139,16 @@ public class AutopilotHost {
             else if (powerAdj < 0 && rampDown) {
                 powerAdj *= -1;
             }
-            double angle = (Math.atan(distY / distX) - Math.PI / 2) - robotAttitude[0];
+
+            double attitude;
+            if (robotAttitude[0] < 0) {
+                attitude = (2 * Math.PI) - robotAttitude[0];
+            }
+            else {
+                attitude = robotAttitude[0];
+            }
+
+            double angle = (Math.atan(distY / distX) - Math.PI / 2) - attitude;
             if (angle > Math.PI) {
                 angle = -angle - Math.PI;
             }
