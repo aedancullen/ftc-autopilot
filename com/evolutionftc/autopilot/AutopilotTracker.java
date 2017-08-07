@@ -26,8 +26,11 @@ public class AutopilotTracker {
 	double ticksPerUnit;
 
 	private BNO055IMU imu;
+
+	int nSubsteps;
   
     private double[] robotPosition = new double[3];
+	private double[] robotAttitude = new double[3];
 
 
     private static double[][] matmul(double[][] firstarray, double[][] secondarray) {
@@ -104,7 +107,7 @@ public class AutopilotTracker {
     }
 
 
-	public AutopilotTracker(DcMotor left, DcMotor right, double ticksPerUnit, BNO055IMU imu) {
+	public AutopilotTracker(DcMotor left, DcMotor right, double ticksPerUnit, BNO055IMU imu, int nSubsteps) {
         this.left = left;
         this.right = right;
         this.imu = imu;
@@ -117,33 +120,59 @@ public class AutopilotTracker {
     }
 
 
-	public double[] getRobotAttitude() {
+	public void update() {
+
+		double[] oldRobotAttitude = new double[3];
+		oldRobotAttitude[0] = robotAttitude[0];
+		oldRobotAttitude[1] = robotAttitude[1];
+		oldRobotAttitude[2] = robotAttitude[2];
+
 		// All of this AxisReference, AxesOrder and AngleUnit rubbish is overcomplicated garbage and has no reason to exist.
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-		double[] out = {angles.firstAngle, 0.0, 0.0};
-		return out;
-    }
+		robotAttitude[0] = angles.firstAngle;
 
-
-    public double[] getRobotPosition() {
-
-	long ticksRight = right.getCurrentPosition();
-	long ticksLeft = left.getCurrentPosition();
+		long ticksRight = right.getCurrentPosition();
+		long ticksLeft = left.getCurrentPosition();
 	    
     	double yval = (((double)(ticksRight - renc) / ticksPerUnit) + ((ticksLeft - lenc) / ticksPerUnit)) / 2.0;
 
     	renc = ticksRight;
 		lenc = ticksLeft;
 
-    	double[] translation = {0.0, yval, 0.0};
+    	double[] translationDeltaPerStep = {0.0, yval / (double)nSubsteps, 0.0};
+		double[] rotationDeltaPerStep = new double[3];
+		for (int i=0; i<3; i++) {
+			// rotationDeltaPerStep * nSubsteps equals the difference between oldRobotAttitude and robotAttitude.
+			rotationDeltaPerStep[i] = (robotAttitude[i] - oldRobotAttitude[i]) / (double)nSubsteps;
+		}
 
-    	// isn't this so noice and clean, unlike the ftc_app api
-    	robotPosition = transform(robotPosition, translation, getRobotAttitude());
-    	return robotPosition;
+		for (int i=0; i < nSubsteps; i++) {
+			// isn't this so noice and clean, unlike the ftc_app api
+			double[] robotAttitudeThisStep = new double[3];
+
+			for (int j=0; j<3; j++) {
+				// Probably the most confusing part. Add (i) mini-steps to the old starting attitude.
+				robotAttitudeThisStep[j] = oldRobotAttitude[j] + (rotationDeltaPerStep[j] * i);
+			}
+			robotPosition = transform(robotPosition, translationDeltaPerStep, robotAttitudeThisStep);
+		}
+
     }
+
+	public double[] getRobotPosition() {
+		return robotPosition;
+	}
+
+	public double[] getRobotAttitude() {
+		return robotAttitude;
+	}
 
     public void setRobotPosition(double[] position) {
       robotPosition = position;
     }
+
+	public void setRobotAttitude(double[] attitude) {
+		robotAttitude = attitude;
+	}
 
 }

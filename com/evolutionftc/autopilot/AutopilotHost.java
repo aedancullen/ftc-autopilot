@@ -51,7 +51,9 @@ public class AutopilotHost {
     }
 	
     public void communicate(AutopilotTracker tracker) {
+        tracker.setRobotAttitude(robotAttitude);
         tracker.setRobotPosition(robotPosition);
+        tracker.update();
     	robotAttitude = tracker.getRobotAttitude();
         robotPosition = tracker.getRobotPosition();
 
