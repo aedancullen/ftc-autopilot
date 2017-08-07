@@ -116,6 +116,7 @@ public class AutopilotTracker {
 
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
+		parameters.calibrationDataFile = "BNO055IMUCalibration.json";
 
 		imu.initialize(parameters);
     }
