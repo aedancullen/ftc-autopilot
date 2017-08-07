@@ -144,7 +144,7 @@ public class AutopilotHost {
 
             double attitude;
             if (robotAttitude[0] < 0) {
-                attitude = (2 * Math.PI) - robotAttitude[0];
+                attitude = (2 * Math.PI) + robotAttitude[0];
             }
             else {
                 attitude = robotAttitude[0];
