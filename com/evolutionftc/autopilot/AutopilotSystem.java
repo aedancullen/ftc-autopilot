@@ -52,6 +52,7 @@ public abstract class AutopilotSystem {
             currentSegment = newSegment;
             if (currentSegment != null) {
                 host.setNavigationTarget(currentSegment);
+                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
                 return host.navigationTickDifferential();
             }
             else {
@@ -67,6 +68,7 @@ public abstract class AutopilotSystem {
             currentSegment = newSegment;
             if (currentSegment != null) {
                 host.setNavigationTarget(currentSegment);
+                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
                 return host.navigationTickDifferential();
             }
             else {
