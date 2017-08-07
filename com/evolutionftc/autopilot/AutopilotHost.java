@@ -140,21 +140,17 @@ public class AutopilotHost {
                 powerAdj *= -1;
             }
 
-            double attitude;
-            if (robotAttitude[0] < 0) {
-                attitude = (2 * Math.PI) + robotAttitude[0];
-            }
-            else {
-                attitude = robotAttitude[0];
-            }
+            double attitude = robotAttitude[0];
 
-            double angle = (Math.atan(distY / distX) - Math.PI / 2) - attitude;
-            if (angle > Math.PI) {
-                angle = -angle - Math.PI;
-            }
+
+            double targAngle = -Math.atan(distX / distY);
+
+            double angle = targAngle - attitude;
+
+
             if (Math.abs(angle) < Math.PI / 2) { // Drive forward
-                double powerLeft = Math.max((basePower - powerAdj), lowestPower) - (angle * steeringGain);
-                double powerRight = Math.max((basePower - powerAdj), lowestPower) + (angle * steeringGain);
+                double powerLeft = Math.max((basePower - powerAdj) - (angle * steeringGain), lowestPower);
+                double powerRight = Math.max((basePower - powerAdj + (angle * steeringGain)), lowestPower);
                 powerLeft = Math.min(powerLeft, 1);
                 powerRight = Math.min(powerRight, 1);
                 return new double[]{powerLeft, powerRight};
@@ -169,8 +165,8 @@ public class AutopilotHost {
                 }
                 // Drive backward
                 // Note that we swap min and max, use -basePower, -lowestPower, and swap the steering gain operations (+ and -)
-                double powerLeft = Math.min((-basePower - powerAdj), -lowestPower) + (angle * steeringGain);
-                double powerRight = Math.min((-basePower - powerAdj), -lowestPower) - (angle * steeringGain);
+                double powerLeft = Math.min((-basePower - powerAdj) + (angle * steeringGain), -lowestPower);
+                double powerRight = Math.min((-basePower - powerAdj) - (angle * steeringGain), -lowestPower);
                 // also note that we must compare to -1
                 powerLeft = Math.max(powerLeft, -1);
                 powerRight = Math.max(powerRight, -1);
