@@ -44,16 +44,18 @@ public class AutopilotHost {
 
     private void telemetryUpdate() {
         telemetry.addData("* AutopilotHost", "\n" +
-                "\t nav: " + navigationStatus.toString().toLowerCase() + "\n" +
-                "\t trg: " + round(navigationTarget[0]) + "," + round(navigationTarget[1]) + "," + round(navigationTarget[2]) + "\n" +
-                "\t pos: " + round(robotPosition[0]) + "," + round(robotPosition[1]) + "," + round(robotPosition[2]) + "\n" +
-                "\t att: " + round(robotAttitude[0]) + "," + round(robotAttitude[1]) + "," + round(robotAttitude[2]));
+                "\t nav:  " + navigationStatus.toString().toLowerCase() + "\n" +
+                "\t trg:  " + round(navigationTarget[0]) + ",  " + round(navigationTarget[1]) + ",  " + round(navigationTarget[2]) + "\n" +
+                "\t pos:  " + round(robotPosition[0]) + ",  " + round(robotPosition[1]) + ",  " + round(robotPosition[2]) + "\n" +
+                "\t att:  " + round(robotAttitude[0]) + ",  " + round(robotAttitude[1]) + ",  " + round(robotAttitude[2]));
     }
 	
     public void communicate(AutopilotTracker tracker) {
         tracker.setRobotPosition(robotPosition);
     	robotAttitude = tracker.getRobotAttitude();
         robotPosition = tracker.getRobotPosition();
+
+        telemetryUpdate();
     }
 
     public NavigationStatus getNavigationStatus() {
@@ -137,7 +139,7 @@ public class AutopilotHost {
             else if (powerAdj < 0 && rampDown) {
                 powerAdj *= -1;
             }
-            double angle = (Math.atan(distY / distX) - Math.PI / 2) - robotAttitude[3];
+            double angle = (Math.atan(distY / distX) - Math.PI / 2) - robotAttitude[0];
             if (angle > Math.PI) {
                 angle = -angle - Math.PI;
             }

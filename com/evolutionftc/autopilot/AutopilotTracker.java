@@ -23,7 +23,7 @@ public class AutopilotTracker {
 
 	long lenc;
 	long renc;
-	long ticksPerUnit;
+	double ticksPerUnit;
 
 	private BNO055IMU imu;
   
@@ -104,7 +104,7 @@ public class AutopilotTracker {
     }
 
 
-	public AutopilotTracker(DcMotor left, DcMotor right, long ticksPerUnit, BNO055IMU imu) {
+	public AutopilotTracker(DcMotor left, DcMotor right, double ticksPerUnit, BNO055IMU imu) {
         this.left = left;
         this.right = right;
         this.imu = imu;
@@ -120,20 +120,20 @@ public class AutopilotTracker {
 	public double[] getRobotAttitude() {
 		// All of this AxisReference, AxesOrder and AngleUnit rubbish is overcomplicated garbage and has no reason to exist.
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-		double[] out = {angles.firstAngle, angles.secondAngle, angles.thirdAngle};
+		double[] out = {angles.firstAngle, 0.0, 0.0};
 		return out;
     }
 
 
     public double[] getRobotPosition() {
 
-	long ticksRight = right.getCurrentPosition() / ticksPerUnit;
-	long ticksLeft = left.getCurrentPosition() / ticksPerUnit;
+	long ticksRight = right.getCurrentPosition();
+	long ticksLeft = left.getCurrentPosition();
 	    
-    	double yval = (ticksRight - renc + ticksLeft - lenc) / 2.0;
+    	double yval = (((double)(ticksRight - renc) / ticksPerUnit) + ((ticksLeft - lenc) / ticksPerUnit)) / 2.0;
 
-    	renc = right.getCurrentPosition();
-		lenc = left.getCurrentPosition();
+    	renc = ticksRight;
+		lenc = ticksLeft;
 
     	double[] translation = {0.0, yval, 0.0};
 

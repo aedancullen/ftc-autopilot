@@ -87,10 +87,10 @@ public class AutopilotPath {
 
     private void telemetryUpdate() {
         telemetry.addData("* AutopilotPath", "\n" +
-                "\t csv: " + pathName + "\n" +
-                "\t cur: " + currentSegmentId + "\n" +
-                "\t suc: " + successSegmentId + "\n" +
-                "\t fai: " + failSegmentId);
+                "\t csv:  " + pathName + "\n" +
+                "\t cur:  " + currentSegmentId + "\n" +
+                "\t suc:  " + successSegmentId + "\n" +
+                "\t fai:  " + failSegmentId);
     }
 
     public AutopilotSegment getSegment(String id) {
