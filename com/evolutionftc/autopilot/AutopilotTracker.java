@@ -104,7 +104,7 @@ public class AutopilotTracker {
     }
 
 
-	public AutopilotTracker(DcMotor left, DcMotor right, long ticksperUnit, BNO055IMU imu) {
+	public AutopilotTracker(DcMotor left, DcMotor right, long ticksPerUnit, BNO055IMU imu) {
         this.left = left;
         this.right = right;
         this.imu = imu;
