@@ -39,7 +39,6 @@ public class AutopilotHost {
 
     public AutopilotHost(Telemetry telemetry) {
         this.telemetry = telemetry;
-	telemetryUpdate();
     }
 
     private void telemetryUpdate() {
@@ -66,7 +65,7 @@ public class AutopilotHost {
 	
     public void setNavigationStatus(NavigationStatus navigationStatus) {
 	this.navigationStatus = navigationStatus;
-	telemetryUpdate();
+
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
@@ -86,7 +85,7 @@ public class AutopilotHost {
         double distY = navigationTarget[1] - robotPosition[1];
         double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
         navigationHalfway = dist / 2;
-	telemetryUpdate();
+
     }
 
     public double[] getNavigationTarget() {
@@ -116,7 +115,6 @@ public class AutopilotHost {
 
     public double[] navigationTickDifferential() {
 
-        telemetryUpdate();
 		
         if (
                     hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&

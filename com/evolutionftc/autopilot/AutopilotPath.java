@@ -82,7 +82,7 @@ public class AutopilotPath {
            throw new UnsupportedOperationException("Encountered unparseable line in path file, is it of the correct format?");
         }
         this.pathName = this.pathName + " - loaded " + pathSegments.size() + " segments";
-        telemetryUpdate();
+
     }
 
     private void telemetryUpdate() {
