@@ -112,6 +112,7 @@ public class AutopilotTracker {
         this.right = right;
         this.imu = imu;
 	this.ticksPerUnit = ticksPerUnit;
+		this.nSubsteps = nSubsteps;
 
 		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 		parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
@@ -134,7 +135,7 @@ public class AutopilotTracker {
 		long ticksRight = right.getCurrentPosition();
 		long ticksLeft = left.getCurrentPosition();
 	    
-    	double yval = (((double)(ticksRight - renc) / ticksPerUnit) + ((ticksLeft - lenc) / ticksPerUnit)) / 2.0;
+    	double yval = (((double)(ticksRight - renc) / ticksPerUnit) + ((double)(ticksLeft - lenc) / ticksPerUnit)) / 2.0;
 
     	renc = ticksRight;
 		lenc = ticksLeft;
