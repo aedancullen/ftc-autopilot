@@ -13,7 +13,7 @@ import java.io.IOException;
 // copyright 2017 aedan cullen.
 
 
-public abstract class AutopilotSystem {
+public class AutopilotSystem {
 
 	private Telemetry telemetry;
 	private AutopilotTracker tracker;
@@ -23,7 +23,6 @@ public abstract class AutopilotSystem {
 	
 	private AutopilotSegment currentSegment;
 
-    public AutopilotSystem() {}
 	
 	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry) {
 		host = new AutopilotHost(telemetry);
@@ -31,15 +30,17 @@ public abstract class AutopilotSystem {
 		this.telemetry = telemetry;
 	}
 	
-	public void beginPathTravel(String pathName) throws IOException {
+	public void beginPathTravel(String pathName) {
 		pathFollower = new AutopilotPath(pathName, telemetry);
 	}
 	
-	public abstract void onSegmentTransition(AutopilotSegment previous, AutopilotSegment next, boolean wasOkayToContinue);
+	public void onSegmentTransition(AutopilotSegment previous, AutopilotSegment next, boolean wasOkayToContinue) {}
 	
-	public abstract boolean shouldContinue(AutopilotSegment segment,
+	public boolean shouldContinue(AutopilotSegment segment,
                                            double[] robotAttitude,
-                                           double[] robotPosition);
+                                           double[] robotPosition) {
+        return true;
+    }
 
     public double[] systemTick() {
         host.communicate(tracker);
