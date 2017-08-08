@@ -156,10 +156,12 @@ public class AutopilotHost {
             }
 
             if (Math.abs(angle) < Math.PI / 2) { // Drive forward
-                double powerLeft = Math.max((basePower - powerAdj) - (angle * steeringGain), lowestPower);
-                double powerRight = Math.max((basePower - powerAdj + (angle * steeringGain)), lowestPower);
+                double powerLeft = Math.max((basePower - powerAdj), lowestPower) - (angle * steeringGain);
+                double powerRight = Math.max((basePower - powerAdj), lowestPower) + (angle * steeringGain);
                 powerLeft = Math.min(powerLeft, 1);
                 powerRight = Math.min(powerRight, 1);
+                powerLeft = Math.max(powerLeft, -1);
+                powerRight = Math.max(powerRight, -1);
                 return new double[]{powerLeft, powerRight};
             }
             else {
@@ -172,11 +174,13 @@ public class AutopilotHost {
                 }
                 // Drive backward
                 // Note that we swap min and max, use -basePower, -lowestPower, and swap the steering gain operations (+ and -)
-                double powerLeft = Math.min((-basePower - powerAdj) + (angle * steeringGain), -lowestPower);
-                double powerRight = Math.min((-basePower - powerAdj) - (angle * steeringGain), -lowestPower);
+                double powerLeft = Math.min((-basePower - powerAdj), -lowestPower) + (angle * steeringGain);
+                double powerRight = Math.min((-basePower - powerAdj), -lowestPower) - (angle * steeringGain);
                 // also note that we must compare to -1
                 powerLeft = Math.max(powerLeft, -1);
                 powerRight = Math.max(powerRight, -1);
+                powerLeft = Math.min(powerLeft, 1);
+                powerRight = Math.min(powerRight, 1);
                 return new double[]{powerLeft, powerRight};
             }
         }
