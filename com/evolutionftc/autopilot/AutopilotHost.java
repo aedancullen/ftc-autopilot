@@ -147,6 +147,13 @@ public class AutopilotHost {
 
             double angle = targAngle - attitude;
 
+            
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
 
             if (Math.abs(angle) < Math.PI / 2) { // Drive forward
                 double powerLeft = Math.max((basePower - powerAdj) - (angle * steeringGain), lowestPower);
