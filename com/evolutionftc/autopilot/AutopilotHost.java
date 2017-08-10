@@ -167,12 +167,17 @@ public class AutopilotHost {
             else {
                 // Calculate the angle with respect to the back of the robot.
 
-                angle -= Math.PI;
+                if (angle > 0) {
+                    angle = Math.PI - angle;
+                }
+                else{
+                    angle = -Math.PI - angle;
+                }
 
                 // Drive backward
-                // Note that we swap min and max, use -basePower, -lowestPower
-                double powerLeft = Math.min((-basePower + powerAdj), -lowestPower) - (angle * steeringGain);
-                double powerRight = Math.min((-basePower + powerAdj), -lowestPower) + (angle * steeringGain);
+                // Note that we swap min and max, use -basePower, -lowestPower, and reverse steering operations
+                double powerLeft = Math.min((-basePower + powerAdj), -lowestPower) + (angle * steeringGain);
+                double powerRight = Math.min((-basePower + powerAdj), -lowestPower) - (angle * steeringGain);
                 // also note that we must compare to -1
                 powerLeft = Math.max(powerLeft, -1);
                 powerRight = Math.max(powerRight, -1);
