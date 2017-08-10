@@ -40,7 +40,7 @@ public class AutopilotPath {
             throw new IllegalStateException("Android external storage is not readable");
         }
         String storagePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File pathsLocation = new File(storagePath + "/AutopilotPaths");
+        File pathsLocation = new File(storagePath + "/Autopilot Paths");
         File pathFile = new File(pathsLocation, pathName);
         try (BufferedReader pathReader = new BufferedReader(new FileReader(pathFile))) {
             String header = pathReader.readLine();
