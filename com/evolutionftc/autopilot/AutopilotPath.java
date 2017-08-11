@@ -86,11 +86,11 @@ public class AutopilotPath {
     }
 
     private void telemetryUpdate() {
-        telemetry.addData("* AutopilotPath", "\n" +
-                "\t csv:  " + pathName + "\n" +
-                "\t cur:  " + currentSegmentId + "\n" +
-                "\t suc:  " + successSegmentId + "\n" +
-                "\t fai:  " + failSegmentId);
+        telemetry.addData("* AutopilotPath (ftc-autopilot by Aedan Cullen)", "\n" +
+                "\t file:  " + pathName + "\n" +
+                "\t current:  " + currentSegmentId + "\n" +
+                "\t next:  " + successSegmentId + "\n" +
+                "\t fallback:  " + failSegmentId);
     }
 
     public AutopilotSegment getSegment(String id) {
