@@ -17,7 +17,7 @@ public class AutopilotHost {
 
     Telemetry telemetry;
 
-    public enum NavigationStatus {RUNNING, STOPPED};
+    public enum NavigationStatus {RUNNING, ORIENTING, STOPPED};
 
     private NavigationStatus navigationStatus = NavigationStatus.STOPPED;
 
@@ -30,8 +30,10 @@ public class AutopilotHost {
     private boolean rampDown;
 
     private double[] navigationTarget = new double[3];
+    private double orientationTarget;
     private double steeringGain;
     private double[] accuracyThreshold;
+    private double orientationThreshold;
 
     private double[] robotAttitude = new double[3];
 
@@ -69,13 +71,15 @@ public class AutopilotHost {
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
-        setNavigationTarget(target.navigationTarget, target.steeringGain, target.accuracyThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown);
+        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown);
     }
 
-    public void setNavigationTarget(double[] navigationTarget, double steeringGain, double[] accuracyThreshold, double basePower, double lowestPower, double powerGain, boolean rampUp, boolean rampDown) {
+    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double steeringGain, double[] accuracyThreshold, double orientationThreshold, double basePower, double lowestPower, double powerGain, boolean rampUp, boolean rampDown) {
         this.navigationTarget = navigationTarget;
+        this.orientationTarget = orientationTarget;
         this.steeringGain = steeringGain;
         this.accuracyThreshold = accuracyThreshold;
+        this.orientationThreshold = orientationThreshold;
         this.basePower = basePower;
         this.lowestPower = lowestPower;
         this.powerGain = powerGain;

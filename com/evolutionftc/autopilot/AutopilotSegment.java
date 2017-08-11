@@ -14,8 +14,10 @@ public class AutopilotSegment {
     public String fail;
 
     public double[] navigationTarget;
+    public double orientationTarget;
     public double steeringGain;
     public double[] accuracyThreshold;
+    public double orientationThreshold;
     public double basePower;
     public double lowestPower;
     public double powerGain;
