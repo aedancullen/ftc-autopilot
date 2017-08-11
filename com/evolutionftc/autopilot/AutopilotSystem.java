@@ -37,8 +37,6 @@ public class AutopilotSystem {
 	public void beginPathTravel(String pathName) {
 		pathFollower = new AutopilotPath(pathName, telemetry, appContext);
 
-        host.telemetryUpdate();
-        pathFollower.telemetryUpdate();
 	}
 	
 	public void onSegmentTransition(AutopilotSegment previous, AutopilotSegment next, boolean wasOkayToContinue) {}
