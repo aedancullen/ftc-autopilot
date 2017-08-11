@@ -145,6 +145,10 @@ public class AutopilotHost {
 
             double targAngle = -Math.atan(distX / distY);
 
+            if (distY < 0) { // accommodate atan's restricted-range output, and expand it accordingly
+                targAngle += Math.PI;
+            }
+
             double angle = targAngle - attitude;
 
             
