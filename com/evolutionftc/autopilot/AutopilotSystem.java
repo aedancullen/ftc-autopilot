@@ -1,6 +1,8 @@
 package com.evolutionftc.autopilot;
 
 
+import android.content.Context;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.io.IOException;
 public class AutopilotSystem {
 
 	private Telemetry telemetry;
+    private Context appContext;
 	private AutopilotTracker tracker;
 	
 	public AutopilotHost host;
@@ -24,14 +27,15 @@ public class AutopilotSystem {
 	private AutopilotSegment currentSegment;
 
 	
-	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry) {
+	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry, Context appContext) {
 		host = new AutopilotHost(telemetry);
 		this.tracker = tracker;
 		this.telemetry = telemetry;
+        this.appContext = appContext;
 	}
 	
 	public void beginPathTravel(String pathName) {
-		pathFollower = new AutopilotPath(pathName, telemetry);
+		pathFollower = new AutopilotPath(pathName, telemetry, appContext);
 	}
 	
 	public void onSegmentTransition(AutopilotSegment previous, AutopilotSegment next, boolean wasOkayToContinue) {}

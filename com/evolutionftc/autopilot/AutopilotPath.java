@@ -1,15 +1,14 @@
 package com.evolutionftc.autopilot;
 
 
-
-import android.os.Environment;
+import android.content.Context;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import java.util.List;
 public class AutopilotPath {
 
     private Telemetry telemetry;
+    private Context appContext;
 
     String pathName;
 
@@ -32,17 +32,15 @@ public class AutopilotPath {
     private String successSegmentId = "NOTHINGNOTHINGNOTHING";
     private String failSegmentId = "NOTHINGNOTHINGNOTHING";
 
-    public AutopilotPath(String pathName, Telemetry telemetry) {
+    public AutopilotPath(String pathName, Telemetry telemetry, Context appContext) {
         this.telemetry = telemetry;
+        this.appContext = appContext;
         this.pathName = pathName;
-		String state = Environment.getExternalStorageState();
-        if (!(Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state))) {
-            throw new IllegalStateException("Android external storage is not readable");
-        }
-        String storagePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File pathsLocation = new File(storagePath + "/Autopilot Paths");
-        File pathFile = new File(pathsLocation, pathName);
-        try (BufferedReader pathReader = new BufferedReader(new FileReader(pathFile))) {
+
+        InputStream ins = appContext.getResources().openRawResource(
+                appContext.getResources().getIdentifier(pathName, "raw", appContext.getPackageName()));
+
+        try (BufferedReader pathReader = new BufferedReader(new InputStreamReader(ins))) {
             String header = pathReader.readLine();
             String line = pathReader.readLine();
 			if (!header.toLowerCase().equals(
