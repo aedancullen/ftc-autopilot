@@ -33,7 +33,7 @@ public class AutopilotHost {
     private double[] navigationTarget = new double[3];
     private double orientationTarget;
     private double steeringGain;
-    private double[] accuracyThreshold;
+    private double[] accuracyThreshold = new double[3];
     private double orientationThreshold;
 
     private double[] robotAttitude = new double[3];
@@ -44,7 +44,7 @@ public class AutopilotHost {
         this.telemetry = telemetry;
     }
 
-    private void telemetryUpdate() {
+    public void telemetryUpdate() {
         telemetry.addData("* AutopilotHost (ftc-autopilot by Aedan Cullen)", "\n" +
                 "\t status:  " + navigationStatus.toString().toLowerCase() + "\n" +
                 "\t target:  " + round(navigationTarget[0]) + ",  " + round(navigationTarget[1]) + ",  " + round(navigationTarget[2]) + "\n" +
@@ -58,8 +58,6 @@ public class AutopilotHost {
         tracker.update();
     	robotAttitude = tracker.getRobotAttitude();
         robotPosition = tracker.getRobotPosition();
-
-        telemetryUpdate();
     }
 
     public NavigationStatus getNavigationStatus() {

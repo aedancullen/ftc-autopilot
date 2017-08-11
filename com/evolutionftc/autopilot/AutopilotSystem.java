@@ -49,6 +49,9 @@ public class AutopilotSystem {
     public double[] systemTick() {
         host.communicate(tracker);
 
+        host.telemetryUpdate();
+        pathFollower.telemetryUpdate();
+
         double[] res = host.navigationTickDifferential();
 		
         if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
