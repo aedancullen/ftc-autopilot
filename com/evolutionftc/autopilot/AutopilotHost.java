@@ -223,12 +223,13 @@ public class AutopilotHost {
                 angle = -(-Math.PI * 2 - angle);
             }
 
-            if (angle > 0) {
-                return new double[]{-lowestPower, lowestPower};
-            }
-            else {
-                return new double[]{lowestPower, -lowestPower};
-            }
+            double powerLeft =  -(angle * steeringGain);
+            double powerRight = (angle * steeringGain);
+            powerLeft = Math.min(powerLeft, 1);
+            powerRight = Math.min(powerRight, 1);
+            powerLeft = Math.max(powerLeft, -1);
+            powerRight = Math.max(powerRight, -1);
+            return new double[]{powerLeft, powerRight};
 
         }
 
