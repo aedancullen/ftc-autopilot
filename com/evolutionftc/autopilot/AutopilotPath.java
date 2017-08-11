@@ -44,7 +44,7 @@ public class AutopilotPath {
             String header = pathReader.readLine();
             String line = pathReader.readLine();
 			if (!header.toLowerCase().equals(
-"id,success,fail,targetx,targety,targetz,targetorientation,steeringgain,accuracyx,accuracyy,accuracyz,accuracyorientation,basepower,lowestpower,powergain,rampup,rampdown")){
+"id,success,fail,targetx,targety,targetz,targetorientation,steeringgain,accuracyx,accuracyy,accuracyz,accuracyorientation,basepower,lowestpower,powergain,rampup,rampdown,useorientation")){
 				throw new UnsupportedOperationException("Header line in CSV indicates file unparseable, is it of the correct format?");
 			}
             while (line != null) {
@@ -71,6 +71,7 @@ public class AutopilotPath {
                 newSegment.powerGain = Double.valueOf(lineSegments[14]);
                 newSegment.rampUp = Boolean.valueOf(lineSegments[15]);
                 newSegment.rampDown = Boolean.valueOf(lineSegments[16]);
+                newSegment.useOrientation = Boolean.valueOf(lineSegments[17]);
                 pathSegments.add(newSegment);
                 line = pathReader.readLine();
             }

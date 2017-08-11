@@ -23,4 +23,5 @@ public class AutopilotSegment {
     public double powerGain;
     public boolean rampUp;
     public boolean rampDown;
+    public boolean useOrientation;
 }

@@ -28,6 +28,7 @@ public class AutopilotHost {
     private double navigationHalfway;
     private boolean rampUp;
     private boolean rampDown;
+    private boolean useOrientation;
 
     private double[] navigationTarget = new double[3];
     private double orientationTarget;
@@ -71,10 +72,10 @@ public class AutopilotHost {
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
-        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown);
+        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown, target.useOrientation);
     }
 
-    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double steeringGain, double[] accuracyThreshold, double orientationThreshold, double basePower, double lowestPower, double powerGain, boolean rampUp, boolean rampDown) {
+    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double steeringGain, double[] accuracyThreshold, double orientationThreshold, double basePower, double lowestPower, double powerGain, boolean rampUp, boolean rampDown, boolean useOrientation) {
         this.navigationTarget = navigationTarget;
         this.orientationTarget = orientationTarget;
         this.steeringGain = steeringGain;
@@ -85,6 +86,7 @@ public class AutopilotHost {
         this.powerGain = powerGain;
         this.rampUp = rampUp;
         this.rampDown = rampDown;
+        this.useOrientation = useOrientation;
         double distX = navigationTarget[0] - robotPosition[0];
         double distY = navigationTarget[1] - robotPosition[1];
         double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
@@ -120,16 +122,30 @@ public class AutopilotHost {
     public double[] navigationTickDifferential() {
 
 		
-        if (
+        if ( // State transition case from RUNNING
                     hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
                     hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1]) &&
-                    hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2])
+                    hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2]) &&
+                            navigationStatus == NavigationStatus.RUNNING
            )
         {
-            navigationStatus = NavigationStatus.STOPPED;
-            return new double[2];
+            if (useOrientation) {
+                navigationStatus = NavigationStatus.ORIENTING;
+            }
+            else {
+                navigationStatus = NavigationStatus.STOPPED;
+            }
         }
-        else if (navigationStatus == NavigationStatus.RUNNING) {
+        else if ( // State transition case from ORIENTING
+                    hasReached(robotAttitude[0], orientationTarget, orientationThreshold) &&
+                            navigationStatus == NavigationStatus.ORIENTING
+                )
+        {
+            navigationStatus = NavigationStatus.STOPPED;
+        }
+
+        // Note the BEGINNING of NEW IF CHAIN! Important because the above transitions must be handled NOW
+        if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
             double distX = navigationTarget[0] - robotPosition[0];
             double distY = navigationTarget[1] - robotPosition[1];
             double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
@@ -194,8 +210,31 @@ public class AutopilotHost {
                 return new double[]{powerLeft, powerRight};
             }
         }
+        else if (navigationStatus == NavigationStatus.ORIENTING) { // State action case for ORIENTING
+            double attitude = robotAttitude[0];
 
-        else {
+            double targAngle = orientationTarget;
+
+            double angle = targAngle - attitude;
+
+
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
+
+            if (angle > 0) {
+                return new double[]{-lowestPower, lowestPower};
+            }
+            else {
+                return new double[]{lowestPower, -lowestPower};
+            }
+
+        }
+
+        else { // Navigation status must be STOPPED
             return new double[2];
         }
 
