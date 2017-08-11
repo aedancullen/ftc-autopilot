@@ -137,7 +137,7 @@ public class AutopilotHost {
             }
         }
         else if ( // State transition case from ORIENTING
-                    hasReached(robotAttitude[0], orientationTarget, orientationThreshold) &&
+                    hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold) &&
                             navigationStatus == NavigationStatus.ORIENTING
                 )
         {
