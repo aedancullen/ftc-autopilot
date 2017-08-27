@@ -88,6 +88,9 @@ public class AutopilotHost {
         double distY = navigationTarget[1] - robotPosition[1];
         double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
         navigationHalfway = dist / 2;
+        if (powerGain <= 0) {
+            powerGain = (basePower - lowestPower) / navigationHalfway;
+        }
 
     }
 
