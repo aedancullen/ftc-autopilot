@@ -49,6 +49,8 @@ public class AutopilotTracker {
 
     private static double[][] buildTransform(double[] xyz, double[] hpr){
 
+		// OK people, put your trig hats on because here comes the trig
+
     	// See http://planning.cs.uiuc.edu/node104.html
 
     	double[][] out = new double[4][4];

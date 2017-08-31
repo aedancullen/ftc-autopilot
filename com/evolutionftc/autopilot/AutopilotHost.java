@@ -120,7 +120,6 @@ public class AutopilotHost {
     }
 
     public double[] navigationTickDifferential() {
-
 		
         if ( // State transition case from RUNNING
                     hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
@@ -162,8 +161,11 @@ public class AutopilotHost {
 
             double attitude = robotAttitude[0];
 
+            // OK people, put your trig hats on because here comes the trig
 
             double targAngle = -Math.atan(distX / distY);
+
+            // well, that was easy.
 
             if (distY < 0) { // accommodate atan's restricted-range output, and expand it accordingly
                 targAngle += Math.PI;
