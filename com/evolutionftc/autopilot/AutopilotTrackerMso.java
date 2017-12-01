@@ -36,8 +36,8 @@ public class AutopilotTrackerMso {
 
 	public void update() {
 
-		double distMbX = MbY.getVoltage() / VperMM + MbXOffset;
-		double distMbY = MbY.getVoltage() / VperMM + MbYOffset;
+		double distMbX = (MbX.getVoltage() / VperMM + MbXOffset) / 10.0; // to cm
+		double distMbY = (MbY.getVoltage() / VperMM + MbYOffset) / 10.0;
 		
 		robotPosition =  new double[2]{distMbX, distMbY};
     	}
