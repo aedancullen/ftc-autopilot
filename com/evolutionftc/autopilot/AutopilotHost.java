@@ -243,4 +243,67 @@ public class AutopilotHost {
 
     }
 
+    public double[] navigationTickRaw() {
+	    // Can drive mecanum bases with this, or other weird and wonderful things
+		
+        if ( // State transition case from RUNNING
+                    hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
+                    hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1]) &&
+                    hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2]) &&
+                            navigationStatus == NavigationStatus.RUNNING
+           )
+        {
+	// ORIENTING not supported for a raw tick
+            navigationStatus = NavigationStatus.STOPPED;
+        }
+
+        // Note the BEGINNING of NEW IF CHAIN! Important because the above transitions must be handled NOW
+        if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
+            double distX = navigationTarget[0] - robotPosition[0];
+            double distY = navigationTarget[1] - robotPosition[1];
+            double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+            double powerAdj = (dist - navigationHalfway) * powerGain;
+            if (powerAdj > 0 && !rampUp) {
+                powerAdj = 0;
+            }
+            if (powerAdj < 0 && !rampDown) {
+                powerAdj = 0;
+            }
+            else if (powerAdj < 0 && rampDown) {
+                powerAdj *= -1;
+            }
+
+            double powerX=0;
+	    double powerY=0;
+		
+	    if (distX > 0) {
+	        powerX = Math.max((basePower - powerAdj), lowestPower);
+                
+	    }
+	    else {
+		powerX = Math.max((-basePower + powerAdj), -lowestPower);
+	    }
+		
+	    if (distY > 0) {
+	        powerY = Math.max((basePower - powerAdj), lowestPower);
+                
+	    }
+	    else {
+		powerY = Math.max((-basePower + powerAdj), -lowestPower);
+	    }
+	
+	    powerX = Math.min(powerX, 1);
+            powerX = Math.max(powerX, -1);
+	    powerY = Math.min(powerY, 1);
+            powerY = Math.max(powerY, -1);
+		
+	    return new double[]{powerX, powerY};
+            
+        }
+        
+        else { // Navigation status must be STOPPED
+            return new double[2];
+        }
+
+    }
 }
