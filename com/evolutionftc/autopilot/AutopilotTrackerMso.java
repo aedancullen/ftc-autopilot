@@ -7,7 +7,7 @@ package com.evolutionftc.autopilot;
 // copyright 2017 aedan cullen.
 
 
-// MaxBotix Sonar (raw X/Y) Variant of AutopilotTracker
+// MaxBotix MB1043 Sonar (raw X/Y) Variant of AutopilotTracker
 
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
