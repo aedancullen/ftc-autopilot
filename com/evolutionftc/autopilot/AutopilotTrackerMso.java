@@ -18,6 +18,8 @@ public class AutopilotTrackerMso {
 	
 	double MbXOffset;
 	double MbYOffset;
+	
+	double VperMM = (3.3) / (1024.0 * 5.0);
   
         private double[] robotPosition = new double[3];
 	private double[] robotAttitude = new double[3];
@@ -34,8 +36,8 @@ public class AutopilotTrackerMso {
 
 	public void update() {
 
-		double distMbX = 0 + MbXOffset;
-		double distMbY = 0 + MbYOffset;
+		double distMbX = MbY.getVoltage() / VperMM + MbXOffset;
+		double distMbY = MbY.getVoltage() / VperMM + MbYOffset;
 		
 		robotPosition =  new double[2]{distMbX, distMbY};
     	}
