@@ -7,6 +7,9 @@ package com.evolutionftc.autopilot;
 // copyright 2017 aedan cullen.
 
 
+// Encoder + IMU (dead-reckoning) Variant of AutopilotTracker
+
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
