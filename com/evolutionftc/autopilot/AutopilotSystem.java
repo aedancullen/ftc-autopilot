@@ -25,6 +25,7 @@ public class AutopilotSystem {
 	
 	private AutopilotSegment currentSegment;
 
+	public AutopilotSystem(){}
 	
 	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry, Context appContext) {
 		host = new AutopilotHost(telemetry);
