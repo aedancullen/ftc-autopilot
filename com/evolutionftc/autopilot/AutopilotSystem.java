@@ -47,7 +47,7 @@ public class AutopilotSystem {
         return true;
     }
 
-    public double[] systemTick() {
+    public double[] systemTickDifferential() {
         host.communicate(tracker);
 
         host.telemetryUpdate();
@@ -79,6 +79,49 @@ public class AutopilotSystem {
                 host.setNavigationTarget(currentSegment);
                 host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
                 return host.navigationTickDifferential();
+            }
+            else {
+                return new double[2];
+            }
+        }
+        else {
+            return res;
+        }
+
+    }
+
+    public double[] systemTickRaw() {
+        host.communicate(tracker);
+
+        host.telemetryUpdate();
+        pathFollower.telemetryUpdate();
+
+        double[] res = host.navigationTickRaw();
+
+        if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
+            AutopilotSegment newSegment = pathFollower.moveOnSuccess();
+            onSegmentTransition(currentSegment, newSegment, true);
+            currentSegment = newSegment;
+            if (currentSegment != null) {
+                host.setNavigationTarget(currentSegment);
+                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
+                return host.navigationTickRaw();
+            }
+            else {
+                return new double[2];
+            }
+        }
+        else if (shouldContinue(currentSegment,
+                host.getRobotAttitude(),
+                host.getRobotPosition()) == false)
+        {
+            AutopilotSegment newSegment = pathFollower.moveOnFailure();
+            onSegmentTransition(currentSegment, newSegment, false);
+            currentSegment = newSegment;
+            if (currentSegment != null) {
+                host.setNavigationTarget(currentSegment);
+                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
+                return host.navigationTickRaw();
             }
             else {
                 return new double[2];
