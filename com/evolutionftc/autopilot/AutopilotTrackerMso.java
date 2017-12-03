@@ -10,8 +10,9 @@ package com.evolutionftc.autopilot;
 // MaxBotix MB1043 Sonar (raw X/Y) Variant of AutopilotTracker
 
 
+import com.qualcomm.robotcore.hardware.AnalogInput;
 
-public class AutopilotTrackerMso {
+public class AutopilotTrackerMso extends AutopilotTracker {
 
 	private AnalogInput MbX;
 	private AnalogInput MbY;
@@ -25,7 +26,7 @@ public class AutopilotTrackerMso {
 	private double[] robotAttitude = new double[3];
 	
 
-	public AutopilotTracker(AnalogInput MbX, AnalogInput MbY, double MbXOffset, double MbYOffset) {
+	public AutopilotTrackerMso(AnalogInput MbX, AnalogInput MbY, double MbXOffset, double MbYOffset) {
         
 		this.MbX = MbX;
 		this.MbY = MbY;
@@ -39,7 +40,8 @@ public class AutopilotTrackerMso {
 		double distMbX = (MbX.getVoltage() / VperMM + MbXOffset) / 10.0; // to cm
 		double distMbY = (MbY.getVoltage() / VperMM + MbYOffset) / 10.0;
 		
-		robotPosition =  new double[2]{distMbX, distMbY};
+		robotPosition [0] = distMbX;
+		robotPosition [1] = distMbY;
     	}
 
 	public double[] getRobotPosition() {

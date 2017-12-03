@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-public class AutopilotTracker {
+public class AutopilotTrackerEnc extends AutopilotTracker{
 
 	private DcMotor left;
 	private DcMotor right;
@@ -111,7 +111,7 @@ public class AutopilotTracker {
     }
 
 
-	public AutopilotTracker(DcMotor left, DcMotor right, double ticksPerUnit, BNO055IMU imu, int nSubsteps) {
+	public AutopilotTrackerEnc(DcMotor left, DcMotor right, double ticksPerUnit, BNO055IMU imu, int nSubsteps) {
         this.left = left;
         this.right = right;
         this.imu = imu;
