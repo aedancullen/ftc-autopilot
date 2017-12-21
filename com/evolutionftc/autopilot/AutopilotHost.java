@@ -25,6 +25,8 @@ public class AutopilotHost {
     private double powerGain;
 
     private double navigationHalfway;
+    private double navigationHalfwayX;
+    private double navigationHalfwayY;
     private boolean rampUp;
     private boolean rampDown;
     private boolean useOrientation;
@@ -88,8 +90,10 @@ public class AutopilotHost {
         double distY = navigationTarget[1] - robotPosition[1];
         double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
         navigationHalfway = dist / 2;
-        if (powerGain <= 0) {
-            powerGain = (basePower - lowestPower) / navigationHalfway;
+        navigationHalfwayX = Math.abs(distX) / 2.0;
+        navigationHalfwayY = Math.abs(distY) / 2.0;
+        if (this.powerGain <= 0) {
+            this.powerGain = (basePower - lowestPower) / navigationHalfway;
         }
 
     }
@@ -262,40 +266,59 @@ public class AutopilotHost {
             double distX = navigationTarget[0] - robotPosition[0];
             double distY = navigationTarget[1] - robotPosition[1];
             double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-            double powerAdj = (dist - navigationHalfway) * powerGain;
-            if (powerAdj > 0 && !rampUp) {
-                powerAdj = 0;
+            double powerAdjX = (Math.abs(distX) - navigationHalfwayX) * powerGain;
+            double powerAdjY = (Math.abs(distY) - navigationHalfwayY) * powerGain;
+
+            if (powerAdjX > 0 && !rampUp) {
+                powerAdjX = 0;
             }
-            if (powerAdj < 0 && !rampDown) {
-                powerAdj = 0;
+            if (powerAdjX < 0 && !rampDown) {
+                powerAdjX = 0;
             }
-            else if (powerAdj < 0 && rampDown) {
-                powerAdj *= -1;
+            else if (powerAdjX < 0 && rampDown) {
+                powerAdjX *= -1;
+            }
+
+            if (powerAdjY > 0 && !rampUp) {
+                powerAdjY = 0;
+            }
+            if (powerAdjY < 0 && !rampDown) {
+                powerAdjY = 0;
+            }
+            else if (powerAdjY < 0 && rampDown) {
+                powerAdjY *= -1;
             }
 
             double powerX=0;
 	    double powerY=0;
 		
 	    if (distX > 0) {
-	        powerX = Math.max((basePower - powerAdj), lowestPower);
+	        powerX = Math.max((basePower - powerAdjX), lowestPower);
                 
 	    }
 	    else {
-		powerX = Math.max((-basePower + powerAdj), -lowestPower);
+		powerX = Math.min((-basePower + powerAdjX), -lowestPower);
 	    }
 		
 	    if (distY > 0) {
-	        powerY = Math.max((basePower - powerAdj), lowestPower);
+	        powerY = Math.max((basePower - powerAdjY), lowestPower);
                 
 	    }
 	    else {
-		powerY = Math.max((-basePower + powerAdj), -lowestPower);
+		powerY = Math.min((-basePower + powerAdjY), -lowestPower);
 	    }
 	
 	    powerX = Math.min(powerX, 1);
             powerX = Math.max(powerX, -1);
 	    powerY = Math.min(powerY, 1);
             powerY = Math.max(powerY, -1);
+
+        if (hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0])) {
+            powerX = 0;
+        }
+        if (hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1])) {
+            powerY = 0;
+        }
 		
 	    return new double[]{powerX, powerY};
             

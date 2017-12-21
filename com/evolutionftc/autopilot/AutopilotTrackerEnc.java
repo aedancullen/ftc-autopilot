@@ -118,11 +118,11 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 	this.ticksPerUnit = ticksPerUnit;
 		this.nSubsteps = nSubsteps;
 
-		BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-		parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
-		parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+		//BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+		//parameters.angleUnit           = BNO055IMU.AngleUnit.RADIANS;
+		//parameters.calibrationDataFile = "BNO055IMUCalibration.json";
 
-		imu.initialize(parameters);
+		//imu.initialize(parameters);
     }
 
 
