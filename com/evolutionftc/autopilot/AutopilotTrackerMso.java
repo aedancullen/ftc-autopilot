@@ -43,6 +43,7 @@ public class AutopilotTrackerMso extends AutopilotTracker {
 
 		this.MbRx = MbRx;
 		MbRx.setMode(DigitalChannel.Mode.OUTPUT);
+		MbRx.setState(false);
 		this.MbX = MbX;
 		this.MbY = MbY;
 		this.MbXOffset = MbXOffset;
