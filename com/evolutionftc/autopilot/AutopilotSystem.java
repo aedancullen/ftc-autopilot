@@ -94,7 +94,10 @@ public class AutopilotSystem {
         host.communicate(tracker);
 
         host.telemetryUpdate();
-        pathFollower.telemetryUpdate();
+
+        if (pathFollower != null) {
+            pathFollower.telemetryUpdate();
+        }
 
         double[] res = host.navigationTickRaw();
 
