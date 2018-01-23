@@ -25,6 +25,13 @@ public class AutopilotTrackerMso extends AutopilotTracker {
 	double MbXOffset;
 	double MbYOffset;
 
+	long lastTimeSaneX = -1;
+	long lastTimeSaneY = -1;
+
+	int INSANITY_TIMEOUT = 500; // max. number of ms of insane readings before we give in
+
+	double SANE_INCHES_PER_TICK = 15; // generous, but good enough for filtering outliers
+
 	// HRLV series with 3.3V supply on REV Robotics ADC, from experimental data gathered
 	double inchesPerVolt = 73.123;
 
@@ -36,6 +43,15 @@ public class AutopilotTrackerMso extends AutopilotTracker {
 
 	private double voltageToInches(double voltage){
 		return voltage * inchesPerVolt;
+	}
+
+	private boolean sanityCheck(double lastInput, double currentInput) {
+		if (Math.abs(currentInput - lastInput) > SANE_INCHES_PER_TICK) {
+			return false;
+		}
+		else {
+			return true;
+		}
 	}
 	
 
@@ -61,10 +77,18 @@ public class AutopilotTrackerMso extends AutopilotTracker {
 
 		double distMbX = voltageToInches(MbX.getVoltage()) + MbXOffset;
 		double distMbY = voltageToInches(MbY.getVoltage()) + MbYOffset;
-		
-		robotPosition [0] = distMbX;
-		robotPosition [1] = distMbY;
-    	}
+
+		long time = System.currentTimeMillis();
+
+		if (sanityCheck(robotPosition[0], distMbX) || robotPosition[0] == 0 || time > lastTimeSaneX + INSANITY_TIMEOUT) {
+			robotPosition[0] = distMbX;
+			lastTimeSaneX = time;
+		}
+		if (sanityCheck(robotPosition[1], distMbY) || robotPosition[1] == 0 || time > lastTimeSaneY + INSANITY_TIMEOUT) {
+			robotPosition[1] = distMbY;
+			lastTimeSaneY = time;
+		}
+	}
 
 	public double[] getRobotPosition() {
 		return robotPosition;
