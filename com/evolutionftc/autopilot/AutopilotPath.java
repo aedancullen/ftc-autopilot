@@ -91,7 +91,7 @@ public class AutopilotPath {
                 "\t current:  " + currentSegmentId + "\n" +
                 "\t next:  " + successSegmentId + "\n" +
                 "\t fallback:  " + failSegmentId);
-        telemetry.update();
+        //telemetry.update();
     }
 
     public AutopilotSegment getSegment(String id) {
