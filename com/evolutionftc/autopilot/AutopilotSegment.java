@@ -23,4 +23,22 @@ public class AutopilotSegment {
     public boolean rampUp;
     public boolean rampDown;
     public boolean useOrientation;
+
+    public void populateFromOther(AutopilotSegment other) {
+        this.id = other.id;
+        this.success = other.success;
+        this.fail = other.fail;
+
+        this.navigationTarget = other.navigationTarget;
+        this.orientationTarget = other.orientationTarget;
+        this.steeringGain = other.steeringGain;
+        this.accuracyThreshold = other.accuracyThreshold;
+        this.orientationThreshold = other.orientationThreshold;
+        this.basePower = other.basePower;
+        this.lowestPower = other.lowestPower;
+        this.powerGain = other.powerGain;
+        this.rampUp = other.rampUp;
+        this.rampDown = other.rampDown;
+        this.useOrientation = other.useOrientation;
+    }
 }
