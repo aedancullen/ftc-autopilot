@@ -23,6 +23,8 @@ public class AutopilotHost {
     private double basePower;
     private double lowestPower;
     private double powerGain;
+    private double powerGainX;
+    private double powerGainY;
 
     private double navigationHalfway;
     private double navigationHalfwayX;
@@ -95,6 +97,8 @@ public class AutopilotHost {
         navigationHalfwayY = Math.abs(distY) / 2.0;
         if (this.powerGain <= 0) {
             this.powerGain = (basePower - lowestPower) / navigationHalfway;
+            this.powerGainX = (basePower - lowestPower) / navigationHalfwayX;
+            this.powerGainY = (basePower - lowestPower) / navigationHalfwayY;
         }
 
     }
@@ -267,8 +271,8 @@ public class AutopilotHost {
             double distX = navigationTarget[0] - robotPosition[0];
             double distY = navigationTarget[1] - robotPosition[1];
             double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-            double powerAdjX = (Math.abs(distX) - navigationHalfwayX) * powerGain;
-            double powerAdjY = (Math.abs(distY) - navigationHalfwayY) * powerGain;
+            double powerAdjX = (Math.abs(distX) - navigationHalfwayX) * powerGainX;
+            double powerAdjY = (Math.abs(distY) - navigationHalfwayY) * powerGainY;
 
             if (powerAdjX > 0 && !rampUp) {
                 powerAdjX = 0;
