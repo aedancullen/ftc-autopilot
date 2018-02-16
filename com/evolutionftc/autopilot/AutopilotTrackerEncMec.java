@@ -161,7 +161,7 @@ public class AutopilotTrackerEncMec extends AutopilotTracker{
         double xvalSubLeft = ((double)(ticksFl - flenc) / ticksPerUnit) - ((double)(ticksBl - blenc) / ticksPerUnit);
         double xvalSubRight = ((double)(ticksBr - brenc) / ticksPerUnit) - ((double)(ticksFr - frenc) / ticksPerUnit);
 
-        double xval = (xvalSubLeft + xvalSubRight) / 2.0 / Math.sqrt(2);
+        double xval = (xvalSubLeft + xvalSubRight) / 4.0;
 
         flenc = ticksFl;
         frenc = ticksFr;
