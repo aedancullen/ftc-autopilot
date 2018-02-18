@@ -25,9 +25,9 @@ public class AutopilotSegment {
     public boolean useOrientation;
 
     public void populateFromOther(AutopilotSegment other) {
-        this.id = other.id;
-        this.success = other.success;
-        this.fail = other.fail;
+        //this.id = other.id;
+        //this.success = other.success;
+        //this.fail = other.fail;
 
         this.navigationTarget = other.navigationTarget;
         this.orientationTarget = other.orientationTarget;
