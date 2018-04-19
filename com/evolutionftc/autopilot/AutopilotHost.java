@@ -191,12 +191,13 @@ public class AutopilotHost {
             }
 
             if (Math.abs(angle) < Math.PI / 2) { // Drive forward
-                double powerLeft = Math.max((basePower - powerAdj), lowestPower) - (angle * steeringGain);
-                double powerRight = Math.max((basePower - powerAdj), lowestPower) + (angle * steeringGain);
-                powerLeft = Math.min(powerLeft, basePower);
-                powerRight = Math.min(powerRight, basePower);
-                powerLeft = Math.max(powerLeft, -basePower);
-                powerRight = Math.max(powerRight, -basePower);
+                double chosenPower = Math.max((basePower - powerAdj), lowestPower);
+                double powerLeft = chosenPower - (angle * steeringGain);
+                double powerRight = chosenPower + (angle * steeringGain);
+                powerLeft = Math.min(powerLeft, chosenPower);
+                powerRight = Math.min(powerRight, chosenPower);
+                powerLeft = Math.max(powerLeft, -chosenPower);
+                powerRight = Math.max(powerRight, -chosenPower);
                 return new double[]{powerLeft, powerRight};
             }
             else {
@@ -211,13 +212,14 @@ public class AutopilotHost {
 
                 // Drive backward
                 // Note that we swap min and max, use -basePower, -lowestPower, and reverse steering operations
-                double powerLeft = Math.min((-basePower + powerAdj), -lowestPower) + (angle * steeringGain);
-                double powerRight = Math.min((-basePower + powerAdj), -lowestPower) - (angle * steeringGain);
+                double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
+                double powerLeft = chosenPower + (angle * steeringGain);
+                double powerRight = chosenPower - (angle * steeringGain);
                 // also note that we must compare to -1
-                powerLeft = Math.max(powerLeft, -basePower);
-                powerRight = Math.max(powerRight, -basePower);
-                powerLeft = Math.min(powerLeft, basePower);
-                powerRight = Math.min(powerRight, basePower);
+                powerLeft = Math.max(powerLeft, -chosenPower);
+                powerRight = Math.max(powerRight, -chosenPower);
+                powerLeft = Math.min(powerLeft, chosenPower);
+                powerRight = Math.min(powerRight, chosenPower);
                 return new double[]{powerLeft, powerRight};
             }
         }
