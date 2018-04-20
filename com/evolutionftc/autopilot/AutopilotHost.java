@@ -216,10 +216,10 @@ public class AutopilotHost {
                 double powerLeft = chosenPower + (angle * steeringGain);
                 double powerRight = chosenPower - (angle * steeringGain);
                 // also note that we must compare to -1
-                powerLeft = Math.max(powerLeft, -chosenPower);
-                powerRight = Math.max(powerRight, -chosenPower);
-                powerLeft = Math.min(powerLeft, chosenPower);
-                powerRight = Math.min(powerRight, chosenPower);
+                powerLeft = Math.max(powerLeft, chosenPower);
+                powerRight = Math.max(powerRight, chosenPower);
+                powerLeft = Math.min(powerLeft, -chosenPower);
+                powerRight = Math.min(powerRight, -chosenPower);
                 return new double[]{powerLeft, powerRight};
             }
         }
