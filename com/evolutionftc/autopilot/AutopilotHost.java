@@ -128,6 +128,8 @@ public class AutopilotHost {
         return roundOff;
     }
 
+    double nTimesStable = 0;
+
     public double[] navigationTickDifferential() {
 		
         if ( // State transition case from RUNNING
@@ -139,17 +141,26 @@ public class AutopilotHost {
         {
             if (useOrientation) {
                 navigationStatus = NavigationStatus.ORIENTING;
+                nTimesStable = 0;
             }
             else {
                 navigationStatus = NavigationStatus.STOPPED;
             }
         }
-        else if ( // State transition case from ORIENTING
+
+        /*else if ( // State transition case from ORIENTING
                     hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold) &&
                             navigationStatus == NavigationStatus.ORIENTING
                 )
         {
             navigationStatus = NavigationStatus.STOPPED;
+        }*/
+
+        else if (navigationStatus == NavigationStatus.ORIENTING) {
+            if (hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold)) {nTimesStable++;}
+            if (nTimesStable > 3) {
+                navigationStatus = NavigationStatus.STOPPED;
+            }
         }
 
         // Note the BEGINNING of NEW IF CHAIN! Important because the above transitions must be handled NOW
