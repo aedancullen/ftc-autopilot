@@ -74,7 +74,7 @@ public class AutopilotHost {
         setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown, target.useOrientation);
     }
 
-    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double steeringGain, double[] accuracyThreshold, double orientationThreshold, double basePower, double lowestPower, double powerGain, boolean rampUp, boolean rampDown, boolean useOrientation) {
+    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double steeringGain, double[] accuracyThreshold, double orientationThreshold, double basePower, double lowestPower, boolean rampUp, boolean rampDown, boolean useOrientation) {
         this.navigationTarget = navigationTarget;
         this.orientationTarget = orientationTarget;
         this.steeringGain = steeringGain;
@@ -82,7 +82,6 @@ public class AutopilotHost {
         this.orientationThreshold = orientationThreshold;
         this.basePower = basePower;
         this.lowestPower = lowestPower;
-        this.powerGain = powerGain;
         this.rampUp = rampUp;
         this.rampDown = rampDown;
         this.useOrientation = useOrientation;
@@ -92,11 +91,9 @@ public class AutopilotHost {
         navigationHalfway = dist / 2;
         navigationHalfwayX = Math.abs(distX) / 2.0;
         navigationHalfwayY = Math.abs(distY) / 2.0;
-        if (this.powerGain <= 0) {
-            this.powerGain = (basePower - lowestPower) / navigationHalfway;
-            this.powerGainX = (basePower - lowestPower) / navigationHalfwayX;
-            this.powerGainY = (basePower - lowestPower) / navigationHalfwayY;
-        }
+        this.powerGain = (basePower - lowestPower) / navigationHalfway;
+        this.powerGainX = (basePower - lowestPower) / navigationHalfwayX;
+        this.powerGainY = (basePower - lowestPower) / navigationHalfwayY;
 
     }
 

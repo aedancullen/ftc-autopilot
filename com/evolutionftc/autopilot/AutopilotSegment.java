@@ -16,7 +16,6 @@ public class AutopilotSegment {
     public double orientationThreshold;
     public double basePower;
     public double lowestPower;
-    public double powerGain;
     public boolean rampUp;
     public boolean rampDown;
     public boolean useOrientation;
@@ -33,7 +32,6 @@ public class AutopilotSegment {
         this.orientationThreshold = other.orientationThreshold;
         this.basePower = other.basePower;
         this.lowestPower = other.lowestPower;
-        this.powerGain = other.powerGain;
         this.rampUp = other.rampUp;
         this.rampDown = other.rampDown;
         this.useOrientation = other.useOrientation;

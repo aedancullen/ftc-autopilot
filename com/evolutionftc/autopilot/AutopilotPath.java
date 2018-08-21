@@ -23,10 +23,10 @@ public class AutopilotPath {
     String pathName;
 
     private List<AutopilotSegment> pathSegments = new ArrayList<AutopilotSegment>();
-    private String currentSegmentId = "NOTHINGNOTHINGNOTHING";
+    private String currentSegmentId = "__init__";
 
-    private String successSegmentId = "NOTHINGNOTHINGNOTHING";
-    private String failSegmentId = "NOTHINGNOTHINGNOTHING";
+    private String successSegmentId = "__init__";
+    private String failSegmentId = "__init__";
 
     public AutopilotPath(String pathName, Telemetry telemetry, Context appContext) {
         this.telemetry = telemetry;
@@ -40,7 +40,7 @@ public class AutopilotPath {
             String header = pathReader.readLine();
             String line = pathReader.readLine();
             if (!header.toLowerCase().equals(
-            "id,success,fail,targetx,targety,targetz,targetorientation,steeringgain,accuracyx,accuracyy,accuracyz,accuracyorientation,basepower,lowestpower,powergain,rampup,rampdown,useorientation")){
+            "id,success,fail,targetx,targety,targetz,targetorientation,steeringgain,accuracyx,accuracyy,accuracyz,accuracyorientation,basepower,lowestpower,rampup,rampdown,useorientation")){
                 throw new UnsupportedOperationException("Header line in CSV indicates file unparseable, is it of the correct format?");
             }
             while (line != null) {
@@ -64,10 +64,9 @@ public class AutopilotPath {
                 newSegment.orientationThreshold = Double.valueOf(lineSegments[11]);
                 newSegment.basePower = Double.valueOf(lineSegments[12]);
                 newSegment.lowestPower = Double.valueOf(lineSegments[13]);
-                newSegment.powerGain = Double.valueOf(lineSegments[14]);
-                newSegment.rampUp = Boolean.valueOf(lineSegments[15]);
-                newSegment.rampDown = Boolean.valueOf(lineSegments[16]);
-                newSegment.useOrientation = Boolean.valueOf(lineSegments[17]);
+                newSegment.rampUp = Boolean.valueOf(lineSegments[14]);
+                newSegment.rampDown = Boolean.valueOf(lineSegments[15]);
+                newSegment.useOrientation = Boolean.valueOf(lineSegments[16]);
                 pathSegments.add(newSegment);
                 line = pathReader.readLine();
             }
@@ -102,7 +101,7 @@ public class AutopilotPath {
 
     public AutopilotSegment moveOnSuccess() {
 
-        if (currentSegmentId.equals("NOTHINGNOTHINGNOTHING")) {
+        if (currentSegmentId.equals("__init__")) {
             currentSegmentId = "__start__";
             AutopilotSegment newCurrent = getSegment(currentSegmentId);
             successSegmentId = newCurrent.success;
@@ -122,7 +121,7 @@ public class AutopilotPath {
 
     public AutopilotSegment moveOnFailure() {
 
-        if (currentSegmentId.equals("NOTHINGNOTHINGNOTHING")) {
+        if (currentSegmentId.equals("__init__")) {
             currentSegmentId = "__start__";
             AutopilotSegment newCurrent = getSegment(currentSegmentId);
             successSegmentId = newCurrent.success;
