@@ -37,15 +37,15 @@ public class AutopilotPath {
         this.pathName = pathName;
 
         InputStream ins = appContext.getResources().openRawResource(
-                appContext.getResources().getIdentifier(pathName, "raw", appContext.getPackageName()));
+        appContext.getResources().getIdentifier(pathName, "raw", appContext.getPackageName()));
 
         try (BufferedReader pathReader = new BufferedReader(new InputStreamReader(ins))) {
             String header = pathReader.readLine();
             String line = pathReader.readLine();
-			if (!header.toLowerCase().equals(
-"id,success,fail,targetx,targety,targetz,targetorientation,steeringgain,accuracyx,accuracyy,accuracyz,accuracyorientation,basepower,lowestpower,powergain,rampup,rampdown,useorientation")){
-				throw new UnsupportedOperationException("Header line in CSV indicates file unparseable, is it of the correct format?");
-			}
+            if (!header.toLowerCase().equals(
+            "id,success,fail,targetx,targety,targetz,targetorientation,steeringgain,accuracyx,accuracyy,accuracyz,accuracyorientation,basepower,lowestpower,powergain,rampup,rampdown,useorientation")){
+                throw new UnsupportedOperationException("Header line in CSV indicates file unparseable, is it of the correct format?");
+            }
             while (line != null) {
                 String[] lineSegments = line.split(",");
                 AutopilotSegment newSegment = new AutopilotSegment();
@@ -53,17 +53,17 @@ public class AutopilotPath {
                 newSegment.success = lineSegments[1];
                 newSegment.fail = lineSegments[2];
                 newSegment.navigationTarget = new double[] {
-                                Double.valueOf(lineSegments[3]),
-                                Double.valueOf(lineSegments[4]),
-                                Double.valueOf(lineSegments[5])
-                        };
+                    Double.valueOf(lineSegments[3]),
+                    Double.valueOf(lineSegments[4]),
+                    Double.valueOf(lineSegments[5])
+                };
                 newSegment.orientationTarget = Double.valueOf(lineSegments[6]);
                 newSegment.steeringGain = Double.valueOf(lineSegments[7]);
                 newSegment.accuracyThreshold = new double[] {
-                                Double.valueOf(lineSegments[8]),
-                                Double.valueOf(lineSegments[9]),
-                                Double.valueOf(lineSegments[10])
-                        };
+                    Double.valueOf(lineSegments[8]),
+                    Double.valueOf(lineSegments[9]),
+                    Double.valueOf(lineSegments[10])
+                };
                 newSegment.orientationThreshold = Double.valueOf(lineSegments[11]);
                 newSegment.basePower = Double.valueOf(lineSegments[12]);
                 newSegment.lowestPower = Double.valueOf(lineSegments[13]);
@@ -79,7 +79,7 @@ public class AutopilotPath {
             throw new IllegalStateException("Error loading path file: " + e.getMessage());
         }
         catch (ArrayIndexOutOfBoundsException e) {
-           throw new UnsupportedOperationException("Encountered unparseable line in path file, is it of the correct format?");
+            throw new UnsupportedOperationException("Encountered unparseable line in path file, is it of the correct format?");
         }
         this.pathName = this.pathName + " - loaded " + pathSegments.size() + " segments";
 
@@ -87,10 +87,10 @@ public class AutopilotPath {
 
     public void telemetryUpdate() {
         telemetry.addData("* AutopilotPath (ftc-autopilot by Aedan Cullen)", "\n" +
-                "\t file:  " + pathName + "\n" +
-                "\t current:  " + currentSegmentId + "\n" +
-                "\t next:  " + successSegmentId + "\n" +
-                "\t fallback:  " + failSegmentId);
+        "\t file:  " + pathName + "\n" +
+        "\t current:  " + currentSegmentId + "\n" +
+        "\t next:  " + successSegmentId + "\n" +
+        "\t fallback:  " + failSegmentId);
         //telemetry.update();
     }
 
@@ -119,7 +119,7 @@ public class AutopilotPath {
             failSegmentId = newCurrent.fail;
             return newCurrent;
         }
-        
+
         return null;
     }
 

@@ -30,7 +30,7 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 	private BNO055IMU imu;
 
 	int nSubsteps;
-  
+
     private double[] robotPosition = new double[3];
 	private double[] robotAttitude = new double[3];
 
@@ -39,9 +39,9 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 
         double [][] result = new double[firstarray.length][secondarray[0].length];
 
-		for (int i = 0; i < firstarray.length; i++) { 
-    		for (int j = 0; j < secondarray[0].length; j++) { 
-        		for (int k = 0; k < firstarray[0].length; k++) { 
+		for (int i = 0; i < firstarray.length; i++) {
+    		for (int j = 0; j < secondarray[0].length; j++) {
+        		for (int k = 0; k < firstarray[0].length; k++) {
             		result[i][j] += firstarray[i][k] * secondarray[k][j];
         		}
     		}
@@ -115,7 +115,7 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
         this.left = left;
         this.right = right;
         this.imu = imu;
-	this.ticksPerUnit = ticksPerUnit;
+		this.ticksPerUnit = ticksPerUnit;
 		this.nSubsteps = nSubsteps;
 
 		//BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -139,7 +139,7 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 
 		long ticksRight = right.getCurrentPosition();
 		long ticksLeft = left.getCurrentPosition();
-	    
+
     	double yval = (((double)(ticksRight - renc) / ticksPerUnit) + ((double)(ticksLeft - lenc) / ticksPerUnit)) / 2.0;
 
     	renc = ticksRight;

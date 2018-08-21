@@ -19,28 +19,28 @@ public class AutopilotSystem {
 	private Telemetry telemetry;
     private Context appContext;
 	public AutopilotTracker tracker;
-	
+
 	public AutopilotHost host;
 	public AutopilotPath pathFollower;
-	
+
 	private AutopilotSegment currentSegment;
 
 	public AutopilotSystem(){}
-	
+
 	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry, Context appContext) {
 		host = new AutopilotHost(telemetry);
 		this.tracker = tracker;
 		this.telemetry = telemetry;
         this.appContext = appContext;
 	}
-	
+
 	public void beginPathTravel(String pathName) {
 		pathFollower = new AutopilotPath(pathName, telemetry, appContext);
 
 	}
-	
+
 	public void onSegmentTransition(AutopilotSegment previous, AutopilotSegment next, boolean wasOkayToContinue) {}
-	
+
 	public boolean shouldContinue(AutopilotSegment segment,
                                            double[] robotAttitude,
                                            double[] robotPosition) {
@@ -62,7 +62,7 @@ public class AutopilotSystem {
         telemetry.update();
 
         double[] res = host.navigationTickDifferential();
-		
+
         if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
             AutopilotSegment newSegment = pathFollower.moveOnSuccess();
             onSegmentTransition(currentSegment, newSegment, true);
