@@ -1,14 +1,11 @@
 package com.evolutionftc.autopilot;
 
 
-// this is a snazzy autopilot for ftc made by aedan.
-// it was made somewhat for team #9867, 'evolution'
-// it uses lots of maths.
-// copyright 2017 aedan cullen.
+// Copyright (c) 2016-2018 Aedan Cullen and/or Evolution Robotics.
 
 
 // Encoder + IMU (dead-reckoning) Variant of AutopilotTracker
-// now with bonus strafe tracking for mecanum! 
+// now with bonus strafe tracking for mecanum!
 
 
 import com.qualcomm.hardware.bosch.BNO055IMU;

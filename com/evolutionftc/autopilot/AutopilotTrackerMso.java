@@ -1,10 +1,7 @@
 package com.evolutionftc.autopilot;
 
 
-// this is a snazzy autopilot for ftc made by aedan.
-// it was made somewhat for team #9867, 'evolution'
-// it uses lots of maths.
-// copyright 2017 aedan cullen.
+// Copyright (c) 2016-2018 Aedan Cullen and/or Evolution Robotics.
 
 
 // MaxBotix MB1043 Sonar (raw X/Y) Variant of AutopilotTracker
@@ -21,7 +18,7 @@ public class AutopilotTrackerMso extends AutopilotTracker {
 	private AnalogInput MbY;
 
 	private DigitalChannel MbRx; // ranging trigger pin
-	
+
 	double MbXOffset;
 	double MbYOffset;
 
@@ -37,7 +34,7 @@ public class AutopilotTrackerMso extends AutopilotTracker {
 
 	// HRLV series - 10Hz refresh rate maximum using Rx pin trigger
 	double rxKickIntervalMs = 100;
-  
+
         private double[] robotPosition = new double[3];
 	private double[] robotAttitude = new double[3];
 
@@ -53,7 +50,7 @@ public class AutopilotTrackerMso extends AutopilotTracker {
 			return true;
 		}
 	}
-	
+
 
 	public AutopilotTrackerMso(DigitalChannel MbRx, AnalogInput MbX, AnalogInput MbY, double MbXOffset, double MbYOffset) {
 

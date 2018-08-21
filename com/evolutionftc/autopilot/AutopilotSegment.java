@@ -1,10 +1,7 @@
 package com.evolutionftc.autopilot;
 
 
-// this is a snazzy autopilot for ftc made by aedan.
-// it was made somewhat for team #9867, 'evolution'
-// it uses lots of maths.
-// copyright 2017 aedan cullen.
+// Copyright (c) 2016-2018 Aedan Cullen and/or Evolution Robotics.
 
 
 public class AutopilotSegment {
