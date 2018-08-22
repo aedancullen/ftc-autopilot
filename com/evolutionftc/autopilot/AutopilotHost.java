@@ -108,7 +108,7 @@ public class AutopilotHost {
     public double[] getRobotPosition() {
         return robotPosition;
     }
-
+    
     public void setRobotPosition(double[] position) {
         robotPosition = position;
     }
