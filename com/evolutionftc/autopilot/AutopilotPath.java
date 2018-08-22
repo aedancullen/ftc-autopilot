@@ -82,7 +82,7 @@ public class AutopilotPath {
     }
 
     public void telemetryUpdate() {
-        telemetry.addData("* AutopilotPath (ftc-autopilot by Aedan Cullen)", "\n" +
+        telemetry.addData("* AutopilotPath", "\n" +
         "\t file:  " + pathName + "\n" +
         "\t current:  " + currentSegmentId + "\n" +
         "\t next:  " + successSegmentId + "\n" +

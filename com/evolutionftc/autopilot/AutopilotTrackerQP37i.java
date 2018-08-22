@@ -51,8 +51,6 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
     private static double[][] buildTransform(double[] xyz, double[] hpr){
 
-		// OK people, put your trig hats on because here comes the trig
-
     	// See http://planning.cs.uiuc.edu/node104.html
 
     	double[][] out = new double[4][4];
@@ -87,7 +85,7 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
     private static double[] transform(double[] point, double[] translation, double[] rotation) {
 
-    	// Transform a 3D body by rotation and then translation. See http://planning.cs.uiuc.edu/node104.html
+    	// Transform a 3D body by rotation and then translation.
 
     	double[][] transform = buildTransform(point, rotation);
 
@@ -133,7 +131,6 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 		oldRobotAttitude[1] = robotAttitude[1];
 		oldRobotAttitude[2] = robotAttitude[2];
 
-		// All of this AxisReference, AxesOrder and AngleUnit rubbish is overcomplicated garbage and has no reason to exist.
         Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
 		robotAttitude[0] = angles.firstAngle;
 
@@ -154,7 +151,6 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 		}
 
 		for (int i=0; i < nSubsteps; i++) {
-			// isn't this so noice and clean, unlike the ftc_app api
 			double[] robotAttitudeThisStep = new double[3];
 
 			for (int j=0; j<3; j++) {

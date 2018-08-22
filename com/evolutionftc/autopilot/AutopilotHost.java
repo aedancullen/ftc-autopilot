@@ -45,7 +45,7 @@ public class AutopilotHost {
     }
 
     public void telemetryUpdate() {
-        telemetry.addData("* AutopilotHost (ftc-autopilot by Aedan Cullen)", "\n" +
+        telemetry.addData("* AutopilotHost", "\n" +
         "\t status:  " + navigationStatus.toString().toLowerCase() + "\n" +
         "\t target:  " + round(navigationTarget[0]) + ",  " + round(navigationTarget[1]) + ",  " + round(navigationTarget[2]) + "\n" +
         "\t position:  " + round(robotPosition[0]) + ",  " + round(robotPosition[1]) + ",  " + round(robotPosition[2]) + "\n" +
@@ -157,7 +157,7 @@ public class AutopilotHost {
         }
     }
 
-    // Note the BEGINNING of NEW IF CHAIN! Important because the above transitions must be handled NOW
+    // the above transitions must be handled NOW
     if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
         double distX = navigationTarget[0] - robotPosition[0];
         double distY = navigationTarget[1] - robotPosition[1];
@@ -174,13 +174,7 @@ public class AutopilotHost {
         }
 
         double attitude = robotAttitude[0];
-
-        // OK people, put your trig hats on because here comes the trig
-
         double targAngle = -Math.atan(distX / distY);
-
-        // well, that was easy.
-
         if (distY < 0) { // accommodate atan's restricted-range output, and expand it accordingly
         targAngle += Math.PI;
     }
