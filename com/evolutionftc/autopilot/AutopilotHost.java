@@ -108,7 +108,7 @@ public class AutopilotHost {
     public double[] getRobotPosition() {
         return robotPosition;
     }
-    
+
     public void setRobotPosition(double[] position) {
         robotPosition = position;
     }
@@ -142,197 +142,189 @@ public class AutopilotHost {
             }
         }
 
-        /*else if ( // State transition case from ORIENTING
-        hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold) &&
-        navigationStatus == NavigationStatus.ORIENTING
+
+        else if (navigationStatus == NavigationStatus.ORIENTING) {
+            if (hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold)) {nTimesStable++;}
+            if (nTimesStable > 3) {
+                navigationStatus = NavigationStatus.STOPPED;
+            }
+        }
+
+        // the above transitions must be handled NOW
+        if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
+            double distX = navigationTarget[0] - robotPosition[0];
+            double distY = navigationTarget[1] - robotPosition[1];
+            double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+            double powerAdj = (dist - navigationHalfway) * powerGain;
+            if (powerAdj > 0 && !rampUp) {
+                powerAdj = 0;
+            }
+            if (powerAdj < 0 && !rampDown) {
+                powerAdj = 0;
+            }
+            else if (powerAdj < 0 && rampDown) {
+                powerAdj *= -1;
+            }
+
+            double attitude = robotAttitude[0];
+            double targAngle = -Math.atan(distX / distY);
+            if (distY < 0) { // accommodate atan's restricted-range output, and expand it accordingly
+            targAngle += Math.PI;
+        }
+
+        double angle = targAngle - attitude;
+
+
+        if (angle > Math.PI) {
+            angle = -(Math.PI * 2 - angle);
+        }
+        if (angle < -Math.PI) {
+            angle = -(-Math.PI * 2 - angle);
+        }
+
+        if (Math.abs(angle) < Math.PI / 2) { // Drive forward
+            double chosenPower = Math.max((basePower - powerAdj), lowestPower);
+            double powerLeft = chosenPower - (angle * steeringGain);
+            double powerRight = chosenPower + (angle * steeringGain);
+            powerLeft = Math.min(powerLeft, chosenPower);
+            powerRight = Math.min(powerRight, chosenPower);
+            powerLeft = Math.max(powerLeft, -chosenPower);
+            powerRight = Math.max(powerRight, -chosenPower);
+            return new double[]{powerLeft, powerRight};
+        }
+        else {
+            // Calculate the angle with respect to the back of the robot.
+
+            if (angle > 0) {
+                angle = Math.PI - angle;
+            }
+            else{
+                angle = -Math.PI - angle;
+            }
+
+            // Drive backward
+            // Note that we swap min and max, use -basePower, -lowestPower, and reverse steering operations
+            double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
+            double powerLeft = chosenPower + (angle * steeringGain);
+            double powerRight = chosenPower - (angle * steeringGain);
+            // also note that we must compare to -1
+            powerLeft = Math.max(powerLeft, chosenPower);
+            powerRight = Math.max(powerRight, chosenPower);
+            powerLeft = Math.min(powerLeft, -chosenPower);
+            powerRight = Math.min(powerRight, -chosenPower);
+            return new double[]{powerLeft, powerRight};
+        }
+
+        else if (navigationStatus == NavigationStatus.ORIENTING) { // State action case for ORIENTING
+            double attitude = robotAttitude[0];
+
+            double targAngle = orientationTarget;
+
+            double angle = targAngle - attitude;
+
+
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
+
+            double powerLeft =  -(angle * steeringGain);
+            double powerRight = (angle * steeringGain);
+            powerLeft = Math.min(powerLeft, basePower);
+            powerRight = Math.min(powerRight, basePower);
+            powerLeft = Math.max(powerLeft, -basePower);
+            powerRight = Math.max(powerRight, -basePower);
+            return new double[]{powerLeft, powerRight};
+
+        }
+
+        else { // Navigation status must be STOPPED
+            return new double[2];
+        }
+
+    }
+
+    public double[] navigationTickRaw() {
+        // Can drive mecanum bases with this, or other weird and wonderful things
+
+        if ( // State transition case from RUNNING
+        hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
+        hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1]) &&
+        hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2]) &&
+        navigationStatus == NavigationStatus.RUNNING
         )
         {
-        navigationStatus = NavigationStatus.STOPPED;
-    }*/
-
-    else if (navigationStatus == NavigationStatus.ORIENTING) {
-        if (hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold)) {nTimesStable++;}
-        if (nTimesStable > 3) {
+            // ORIENTING not supported for a raw tick
             navigationStatus = NavigationStatus.STOPPED;
         }
+
+        // Note the BEGINNING of NEW IF CHAIN! Important because the above transitions must be handled NOW
+        if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
+            double distX = navigationTarget[0] - robotPosition[0];
+            double distY = navigationTarget[1] - robotPosition[1];
+            double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+            double powerAdjX = (Math.abs(distX) - navigationHalfwayX) * powerGainX;
+            double powerAdjY = (Math.abs(distY) - navigationHalfwayY) * powerGainY;
+
+            if (powerAdjX > 0 && !rampUp) {
+                powerAdjX = 0;
+            }
+            if (powerAdjX < 0 && !rampDown) {
+                powerAdjX = 0;
+            }
+            else if (powerAdjX < 0 && rampDown) {
+                powerAdjX *= -1;
+            }
+
+            if (powerAdjY > 0 && !rampUp) {
+                powerAdjY = 0;
+            }
+            if (powerAdjY < 0 && !rampDown) {
+                powerAdjY = 0;
+            }
+            else if (powerAdjY < 0 && rampDown) {
+                powerAdjY *= -1;
+            }
+
+            double powerX=0;
+            double powerY=0;
+
+            if (distX > 0) {
+                powerX = Math.max((basePower - powerAdjX), lowestPower);
+
+            }
+            else {
+                powerX = Math.min((-basePower + powerAdjX), -lowestPower);
+            }
+
+            if (distY > 0) {
+                powerY = Math.max((basePower - powerAdjY), lowestPower);
+
+            }
+            else {
+                powerY = Math.min((-basePower + powerAdjY), -lowestPower);
+            }
+
+            powerX = Math.min(powerX, 1);
+            powerX = Math.max(powerX, -1);
+            powerY = Math.min(powerY, 1);
+            powerY = Math.max(powerY, -1);
+
+            if (hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0])) {
+                powerX = 0;
+            }
+            if (hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1])) {
+                powerY = 0;
+            }
+
+            return new double[]{powerX, powerY};
+
+        }
+
+        else { // Navigation status must be STOPPED
+            return new double[2];
+        }
     }
-
-    // the above transitions must be handled NOW
-    if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
-        double distX = navigationTarget[0] - robotPosition[0];
-        double distY = navigationTarget[1] - robotPosition[1];
-        double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-        double powerAdj = (dist - navigationHalfway) * powerGain;
-        if (powerAdj > 0 && !rampUp) {
-            powerAdj = 0;
-        }
-        if (powerAdj < 0 && !rampDown) {
-            powerAdj = 0;
-        }
-        else if (powerAdj < 0 && rampDown) {
-            powerAdj *= -1;
-        }
-
-        double attitude = robotAttitude[0];
-        double targAngle = -Math.atan(distX / distY);
-        if (distY < 0) { // accommodate atan's restricted-range output, and expand it accordingly
-        targAngle += Math.PI;
-    }
-
-    double angle = targAngle - attitude;
-
-
-    if (angle > Math.PI) {
-        angle = -(Math.PI * 2 - angle);
-    }
-    if (angle < -Math.PI) {
-        angle = -(-Math.PI * 2 - angle);
-    }
-
-    if (Math.abs(angle) < Math.PI / 2) { // Drive forward
-        double chosenPower = Math.max((basePower - powerAdj), lowestPower);
-        double powerLeft = chosenPower - (angle * steeringGain);
-        double powerRight = chosenPower + (angle * steeringGain);
-        powerLeft = Math.min(powerLeft, chosenPower);
-        powerRight = Math.min(powerRight, chosenPower);
-        powerLeft = Math.max(powerLeft, -chosenPower);
-        powerRight = Math.max(powerRight, -chosenPower);
-        return new double[]{powerLeft, powerRight};
-    }
-    else {
-        // Calculate the angle with respect to the back of the robot.
-
-        if (angle > 0) {
-            angle = Math.PI - angle;
-        }
-        else{
-            angle = -Math.PI - angle;
-        }
-
-        // Drive backward
-        // Note that we swap min and max, use -basePower, -lowestPower, and reverse steering operations
-        double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
-        double powerLeft = chosenPower + (angle * steeringGain);
-        double powerRight = chosenPower - (angle * steeringGain);
-        // also note that we must compare to -1
-        powerLeft = Math.max(powerLeft, chosenPower);
-        powerRight = Math.max(powerRight, chosenPower);
-        powerLeft = Math.min(powerLeft, -chosenPower);
-        powerRight = Math.min(powerRight, -chosenPower);
-        return new double[]{powerLeft, powerRight};
-    }
-}
-else if (navigationStatus == NavigationStatus.ORIENTING) { // State action case for ORIENTING
-    double attitude = robotAttitude[0];
-
-    double targAngle = orientationTarget;
-
-    double angle = targAngle - attitude;
-
-
-    if (angle > Math.PI) {
-        angle = -(Math.PI * 2 - angle);
-    }
-    if (angle < -Math.PI) {
-        angle = -(-Math.PI * 2 - angle);
-    }
-
-    double powerLeft =  -(angle * steeringGain);
-    double powerRight = (angle * steeringGain);
-    powerLeft = Math.min(powerLeft, basePower);
-    powerRight = Math.min(powerRight, basePower);
-    powerLeft = Math.max(powerLeft, -basePower);
-    powerRight = Math.max(powerRight, -basePower);
-    return new double[]{powerLeft, powerRight};
-
-}
-
-else { // Navigation status must be STOPPED
-    return new double[2];
-}
-
-}
-
-public double[] navigationTickRaw() {
-    // Can drive mecanum bases with this, or other weird and wonderful things
-
-    if ( // State transition case from RUNNING
-    hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
-    hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1]) &&
-    hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2]) &&
-    navigationStatus == NavigationStatus.RUNNING
-    )
-    {
-        // ORIENTING not supported for a raw tick
-        navigationStatus = NavigationStatus.STOPPED;
-    }
-
-    // Note the BEGINNING of NEW IF CHAIN! Important because the above transitions must be handled NOW
-    if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
-        double distX = navigationTarget[0] - robotPosition[0];
-        double distY = navigationTarget[1] - robotPosition[1];
-        double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
-        double powerAdjX = (Math.abs(distX) - navigationHalfwayX) * powerGainX;
-        double powerAdjY = (Math.abs(distY) - navigationHalfwayY) * powerGainY;
-
-        if (powerAdjX > 0 && !rampUp) {
-            powerAdjX = 0;
-        }
-        if (powerAdjX < 0 && !rampDown) {
-            powerAdjX = 0;
-        }
-        else if (powerAdjX < 0 && rampDown) {
-            powerAdjX *= -1;
-        }
-
-        if (powerAdjY > 0 && !rampUp) {
-            powerAdjY = 0;
-        }
-        if (powerAdjY < 0 && !rampDown) {
-            powerAdjY = 0;
-        }
-        else if (powerAdjY < 0 && rampDown) {
-            powerAdjY *= -1;
-        }
-
-        double powerX=0;
-        double powerY=0;
-
-        if (distX > 0) {
-            powerX = Math.max((basePower - powerAdjX), lowestPower);
-
-        }
-        else {
-            powerX = Math.min((-basePower + powerAdjX), -lowestPower);
-        }
-
-        if (distY > 0) {
-            powerY = Math.max((basePower - powerAdjY), lowestPower);
-
-        }
-        else {
-            powerY = Math.min((-basePower + powerAdjY), -lowestPower);
-        }
-
-        powerX = Math.min(powerX, 1);
-        powerX = Math.max(powerX, -1);
-        powerY = Math.min(powerY, 1);
-        powerY = Math.max(powerY, -1);
-
-        if (hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0])) {
-            powerX = 0;
-        }
-        if (hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1])) {
-            powerY = 0;
-        }
-
-        return new double[]{powerX, powerY};
-
-    }
-
-    else { // Navigation status must be STOPPED
-        return new double[2];
-    }
-
-}
 }
