@@ -49,8 +49,6 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 
 	private static double[][] buildTransform(double[] xyz, double[] hpr) {
 
-		// See http://planning.cs.uiuc.edu/node104.html
-
 		double[][] out = new double[4][4];
 
 		double x = xyz[0];
@@ -150,7 +148,7 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 			double[] robotAttitudeThisStep = new double[3];
 
 			for (int j=0; j<3; j++) {
-				// Probably the most confusing part. Add (i) mini-steps to the old starting attitude.
+				// Add (i) mini-steps to the old starting attitude.
 				robotAttitudeThisStep[j] = oldRobotAttitude[j] + (rotationDeltaPerStep[j] * i);
 			}
 			robotPosition = transform(robotPosition, translationDeltaPerStep, robotAttitudeThisStep);

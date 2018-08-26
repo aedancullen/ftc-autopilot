@@ -245,7 +245,7 @@ public class AutopilotHost {
     }
 
     public double[] navigationTickRaw() {
-        // Can drive mecanum bases with this, or other weird and wonderful things
+
 
         if ( // State transition case from RUNNING
         hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
@@ -258,7 +258,7 @@ public class AutopilotHost {
             navigationStatus = NavigationStatus.STOPPED;
         }
 
-        // Note the BEGINNING of NEW IF CHAIN! Important because the above transitions must be handled NOW
+        // the above transitions must be handled NOW
         if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
             double distX = navigationTarget[0] - robotPosition[0];
             double distY = navigationTarget[1] - robotPosition[1];
