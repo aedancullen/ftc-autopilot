@@ -71,7 +71,7 @@ public class AutopilotHost {
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
-        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.powerGain, target.rampUp, target.rampDown, target.useOrientation);
+        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.rampUp, target.rampDown, target.useOrientation);
     }
 
     public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double steeringGain, double[] accuracyThreshold, double orientationThreshold, double basePower, double lowestPower, boolean rampUp, boolean rampDown, boolean useOrientation) {
@@ -161,58 +161,56 @@ public class AutopilotHost {
             }
             if (powerAdj < 0 && !rampDown) {
                 powerAdj = 0;
-            }
-            else if (powerAdj < 0 && rampDown) {
+            } else if (powerAdj < 0 && rampDown) {
                 powerAdj *= -1;
             }
 
             double attitude = robotAttitude[0];
             double targAngle = -Math.atan(distX / distY);
             if (distY < 0) { // accommodate atan's restricted-range output, and expand it accordingly
-            targAngle += Math.PI;
-        }
-
-        double angle = targAngle - attitude;
-
-
-        if (angle > Math.PI) {
-            angle = -(Math.PI * 2 - angle);
-        }
-        if (angle < -Math.PI) {
-            angle = -(-Math.PI * 2 - angle);
-        }
-
-        if (Math.abs(angle) < Math.PI / 2) { // Drive forward
-            double chosenPower = Math.max((basePower - powerAdj), lowestPower);
-            double powerLeft = chosenPower - (angle * steeringGain);
-            double powerRight = chosenPower + (angle * steeringGain);
-            powerLeft = Math.min(powerLeft, chosenPower);
-            powerRight = Math.min(powerRight, chosenPower);
-            powerLeft = Math.max(powerLeft, -chosenPower);
-            powerRight = Math.max(powerRight, -chosenPower);
-            return new double[]{powerLeft, powerRight};
-        }
-        else {
-            // Calculate the angle with respect to the back of the robot.
-
-            if (angle > 0) {
-                angle = Math.PI - angle;
-            }
-            else{
-                angle = -Math.PI - angle;
+                targAngle += Math.PI;
             }
 
-            // Drive backward
-            // Note that we swap min and max, use -basePower, -lowestPower, and reverse steering operations
-            double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
-            double powerLeft = chosenPower + (angle * steeringGain);
-            double powerRight = chosenPower - (angle * steeringGain);
-            // also note that we must compare to -1
-            powerLeft = Math.max(powerLeft, chosenPower);
-            powerRight = Math.max(powerRight, chosenPower);
-            powerLeft = Math.min(powerLeft, -chosenPower);
-            powerRight = Math.min(powerRight, -chosenPower);
-            return new double[]{powerLeft, powerRight};
+            double angle = targAngle - attitude;
+
+
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
+
+            if (Math.abs(angle) < Math.PI / 2) { // Drive forward
+                double chosenPower = Math.max((basePower - powerAdj), lowestPower);
+                double powerLeft = chosenPower - (angle * steeringGain);
+                double powerRight = chosenPower + (angle * steeringGain);
+                powerLeft = Math.min(powerLeft, chosenPower);
+                powerRight = Math.min(powerRight, chosenPower);
+                powerLeft = Math.max(powerLeft, -chosenPower);
+                powerRight = Math.max(powerRight, -chosenPower);
+                return new double[]{powerLeft, powerRight};
+            } else {
+                // Calculate the angle with respect to the back of the robot.
+
+                if (angle > 0) {
+                    angle = Math.PI - angle;
+                } else {
+                    angle = -Math.PI - angle;
+                }
+
+                // Drive backward
+                // Note that we swap min and max, use -basePower, -lowestPower, and reverse steering operations
+                double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
+                double powerLeft = chosenPower + (angle * steeringGain);
+                double powerRight = chosenPower - (angle * steeringGain);
+                // also note that we must compare to -1
+                powerLeft = Math.max(powerLeft, chosenPower);
+                powerRight = Math.max(powerRight, chosenPower);
+                powerLeft = Math.min(powerLeft, -chosenPower);
+                powerRight = Math.min(powerRight, -chosenPower);
+                return new double[]{powerLeft, powerRight};
+            }
         }
 
         else if (navigationStatus == NavigationStatus.ORIENTING) { // State action case for ORIENTING

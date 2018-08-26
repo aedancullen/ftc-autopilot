@@ -108,7 +108,7 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 	}
 
 
-	public AutopilotTrackerEnc(DcMotor x, DcMotor y, double[] sensorPosRelativeToRobot, double ticksPerUnit, BNO055IMU imu, int nSubsteps) {
+	public AutopilotTrackerQP37i(DcMotor x, DcMotor y, double[] sensorPosRelativeToRobot, double ticksPerUnit, BNO055IMU imu, int nSubsteps) {
 		this.x = x;
 		this.y = y;
 		this.sensorPosRelativeToRobot = sensorPosRelativeToRobot;
@@ -138,7 +138,7 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 		long ticksY = y.getCurrentPosition();
 
 		double xval = ((double)(ticksX - xenc) / ticksPerUnit);
-		double yval = ((double)(ticksY - yenc) / ticksPerUnit));
+		double yval = ((double)(ticksY - yenc) / ticksPerUnit);
 
 		xenc = ticksX;
 		yenc = ticksY;
@@ -162,7 +162,7 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
 		// Sensor pos compensate
 
-		for (int i=0, i<3; i++) {
+		for (int i=0; i<3; i++) {
 			robotPosition[i] -= sensorPosRelativeToRobot[i];
 		}
 
