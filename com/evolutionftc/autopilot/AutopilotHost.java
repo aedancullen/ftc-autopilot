@@ -1,3 +1,5 @@
+
+
 package com.evolutionftc.autopilot;
 
 
@@ -39,9 +41,28 @@ public class AutopilotHost {
     private double[] robotAttitude = new double[3];
 
     private double[] robotPosition = new double[3];
+    
+    private boolean[] navigationTargetInverts = new double[3];
+    private boolean orientationTargetInvert = false;
 
     public AutopilotHost(Telemetry telemetry) {
         this.telemetry = telemetry;
+    }
+    
+    public boolean getOrientationTargetInvert() {
+        return this.orientationTargetInvert;
+    }
+    
+    public void setOrientationTargetInvert(boolean orientationTargetInvert) {
+        this.orientationTargetInvert = orientationTargetInvert;
+    }
+    
+    public void getNavigationTargetInverts() {
+        return this.navigationTargetInverts;
+    }
+    
+    public void setNavigationTargetInverts(boolean[] navigationTargetInverts) {
+        this.navigationTargetInverts = navigationTargetInverts;
     }
 
     public void telemetryUpdate() {
@@ -72,6 +93,17 @@ public class AutopilotHost {
 
     public void setNavigationTarget(AutopilotSegment target) {
         setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.rampUp, target.rampDown, target.useOrientation);
+    }
+    
+    private void applyOrientationTargetInvert() {
+    }
+    
+    private void applyNavigationTargetInverts() {
+        for (int i=0; i<3; i++){
+            if (this.navigationTargetInverts[i]) {
+                this.navigationTarget[i] = -this.navigationTarget[i];
+            }
+        }
     }
 
     public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double steeringGain, double[] accuracyThreshold, double orientationThreshold, double basePower, double lowestPower, boolean rampUp, boolean rampDown, boolean useOrientation) {
