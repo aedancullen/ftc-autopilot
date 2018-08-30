@@ -78,6 +78,7 @@ public class AutopilotHost {
         tracker.setRobotAttitude(robotAttitude);
         tracker.setRobotPosition(robotPosition);
         tracker.update();
+
         robotAttitude = tracker.getRobotAttitude();
         robotPosition = tracker.getRobotPosition();
     }
@@ -96,6 +97,7 @@ public class AutopilotHost {
     }
     
     private void applyOrientationTargetInvert() {
+        this.orientationTarget = (Math.PI*2) - this.orientationTarget;
     }
     
     private void applyNavigationTargetInverts() {
