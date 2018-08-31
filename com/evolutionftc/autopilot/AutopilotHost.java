@@ -128,6 +128,14 @@ public class AutopilotHost {
         this.powerGain = (basePower - lowestPower) / navigationHalfway;
         this.powerGainX = (basePower - lowestPower) / navigationHalfwayX;
         this.powerGainY = (basePower - lowestPower) / navigationHalfwayY;
+        
+        if (this.navigationTargetInverts) {
+            this.applyNavigationTargetInverts();
+        }
+        
+        if (this.orientationTargetInvert) {
+            this.applyOrientationTargetInvert();
+        }
 
     }
 
