@@ -12,9 +12,13 @@ import java.io.IOException;
 
 
 public class AutopilotSystem {
+	
+	private static final int VISUALIZER_BROADCAST_INTERVAL_MS = 50;
+	
+	private long msAtLastBroadcast;
 
 	private Telemetry telemetry;
-    private Context appContext;
+    	private Context appContext;
 	public AutopilotTracker tracker;
 
 	public AutopilotHost host;
@@ -23,12 +27,16 @@ public class AutopilotSystem {
 	private AutopilotSegment currentSegment;
 
 	public AutopilotSystem(){}
+	
+	private boolean visualizerBroadcastEnabled;
 
-	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry, Context appContext) {
+	public AutopilotSystem(AutopilotTracker tracker, Telemetry telemetry, Context appContext, boolean visualizerBroadcastEnabled) {
 		host = new AutopilotHost(telemetry);
 		this.tracker = tracker;
 		this.telemetry = telemetry;
-        this.appContext = appContext;
+        	this.appContext = appContext;
+		this.visualizerBroadcastEnabled = visualizerBroadcastEnabled;
+		this.msAtLastBroadcast = System.currentTimeMillis();
 	}
 
 	public void beginPathTravel(String pathName) {
@@ -43,8 +51,25 @@ public class AutopilotSystem {
                                            double[] robotPosition) {
         return true;
     }
+	
+    private void doVisualizerBroadcast(AutopilotHost broadcastHost) {
+        String status = broadcastHost.getNavigationStatus().toString().toLowerCase();
+        double robotX = broadcastHost.getRobotPosition()[0];
+	double robotY = broadcastHost.getRobotPosition()[1];
+	double robotH = broadcastHost.getRobotAttitude()[0];
+	    
+	Log.v("AutopilotVisualizerBroadcast", status+","+robotX+","+robotY+","+robotH);
+    }
 
     public double[] systemTickDifferential() {
+        long timeNow = System.currentTimeMillis();
+	if (visualizerBroadcastEnabled &&
+	    timeNow - msAtLastBroadcast > VISUALIZER_BROADCAST_INTERVAL_MS)
+	{
+            this.doVisualizerBroadcast(host);
+            msAtLastBroadcast = timeNow;
+	}
+	    
         host.communicate(tracker);
 
         host.telemetryUpdate();
