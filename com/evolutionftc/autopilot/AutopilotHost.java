@@ -41,26 +41,26 @@ public class AutopilotHost {
     private double[] robotAttitude = new double[3];
 
     private double[] robotPosition = new double[3];
-    
+
     private boolean[] navigationTargetInverts = new double[3];
     private boolean orientationTargetInvert = false;
 
     public AutopilotHost(Telemetry telemetry) {
         this.telemetry = telemetry;
     }
-    
+
     public boolean getOrientationTargetInvert() {
         return this.orientationTargetInvert;
     }
-    
+
     public void setOrientationTargetInvert(boolean orientationTargetInvert) {
         this.orientationTargetInvert = orientationTargetInvert;
     }
-    
+
     public void getNavigationTargetInverts() {
         return this.navigationTargetInverts;
     }
-    
+
     public void setNavigationTargetInverts(boolean[] navigationTargetInverts) {
         this.navigationTargetInverts = navigationTargetInverts;
     }
@@ -95,11 +95,11 @@ public class AutopilotHost {
     public void setNavigationTarget(AutopilotSegment target) {
         setNavigationTarget(target.navigationTarget, target.orientationTarget, target.steeringGain, target.accuracyThreshold, target.orientationThreshold, target.basePower, target.lowestPower, target.rampUp, target.rampDown, target.useOrientation);
     }
-    
+
     private void applyOrientationTargetInvert() {
         this.orientationTarget = (Math.PI*2) - this.orientationTarget;
     }
-    
+
     private void applyNavigationTargetInverts() {
         for (int i=0; i<3; i++){
             if (this.navigationTargetInverts[i]) {
@@ -128,11 +128,11 @@ public class AutopilotHost {
         this.powerGain = (basePower - lowestPower) / navigationHalfway;
         this.powerGainX = (basePower - lowestPower) / navigationHalfwayX;
         this.powerGainY = (basePower - lowestPower) / navigationHalfwayY;
-        
+
         if (this.navigationTargetInverts) {
             this.applyNavigationTargetInverts();
         }
-        
+
         if (this.orientationTargetInvert) {
             this.applyOrientationTargetInvert();
         }
@@ -272,7 +272,7 @@ public class AutopilotHost {
 
             double powerLeft =  -(angle * steeringGain);
             double powerRight = (angle * steeringGain);
-            
+
             if (powerLeft > 0) {
                 powerLeft = Math.min(powerLeft, basePower);
                 powerLeft = Math.max(powerLeft, lowestPower);
@@ -281,7 +281,7 @@ public class AutopilotHost {
                 powerLeft = Math.max(powerLeft, -basePower);
                 powerLeft = Math.min(powerLeft, -lowestPower);
             }
-            
+
             if (powerRight > 0) {
                 powerRight = Math.min(powerRight, basePower);
                 powerRight = Math.max(powerRight, lowestPower);
@@ -290,7 +290,153 @@ public class AutopilotHost {
                 powerRight = Math.max(powerRight, -basePower);
                 powerRight = Math.min(powerRight, -lowestPower);
             }
-            
+
+            return new double[]{powerLeft, powerRight};
+
+        }
+
+        else { // Navigation status must be STOPPED
+            return new double[2];
+        }
+
+    }
+
+    public double[] navigationTickFoursides() {
+
+        if ( // State transition case from RUNNING
+        hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
+        hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1]) &&
+        hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2]) &&
+        navigationStatus == NavigationStatus.RUNNING
+        )
+        {
+            if (useOrientation) {
+                navigationStatus = NavigationStatus.ORIENTING;
+                nTimesStable = 0;
+            }
+            else {
+                navigationStatus = NavigationStatus.STOPPED;
+            }
+        }
+
+
+        else if (navigationStatus == NavigationStatus.ORIENTING) {
+            if (hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold)) {nTimesStable++;}
+            if (nTimesStable > 3) {
+                navigationStatus = NavigationStatus.STOPPED;
+            }
+        }
+
+        // the above transitions must be handled NOW
+        if (navigationStatus == NavigationStatus.RUNNING) { // State action case for RUNNING
+            double distX = navigationTarget[0] - robotPosition[0];
+            double distY = navigationTarget[1] - robotPosition[1];
+            double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+            double powerAdj = (dist - navigationHalfway) * powerGain;
+            if (powerAdj > 0 && !rampUp) {
+                powerAdj = 0;
+            }
+            if (powerAdj < 0 && !rampDown) {
+                powerAdj = 0;
+            } else if (powerAdj < 0 && rampDown) {
+                powerAdj *= -1;
+            }
+
+            double attitude = robotAttitude[0];
+            double targAngle = -Math.atan(distX / distY);
+            if (distY < 0) { // accommodate atan's restricted-range output, and expand it accordingly
+                targAngle += Math.PI;
+            }
+
+            double angle = targAngle - attitude;
+
+
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
+
+            boolean foursides_perpendicular_flip = false;
+            if (Math.abs(angle) > Math.PI / 4 && Math.abs(angle) < 3 * Math.PI / 4) {
+                // angle within right/left range
+                foursides_perpendicular_flip = true;
+                angle += Math.PI / 4; // Imagine the front of the robot is facing right
+            }
+
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
+
+            if (Math.abs(angle) < Math.PI / 2) {
+                double chosenPower = Math.max((basePower - powerAdj), lowestPower);
+                double powerLeft = chosenPower - (angle * steeringGain);
+                double powerRight = chosenPower + (angle * steeringGain);
+                powerLeft = Math.min(powerLeft, chosenPower);
+                powerRight = Math.min(powerRight, chosenPower);
+                powerLeft = Math.max(powerLeft, -chosenPower);
+                powerRight = Math.max(powerRight, -chosenPower);
+                return new double[]{powerLeft, powerRight};
+            } else {
+
+                if (angle > 0) {
+                    angle = Math.PI - angle;
+                } else {
+                    angle = -Math.PI - angle;
+                }
+
+                double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
+                double powerLeft = chosenPower + (angle * steeringGain);
+                double powerRight = chosenPower - (angle * steeringGain);
+
+                powerLeft = Math.max(powerLeft, chosenPower);
+                powerRight = Math.max(powerRight, chosenPower);
+                powerLeft = Math.min(powerLeft, -chosenPower);
+                powerRight = Math.min(powerRight, -chosenPower);
+                return new double[]{foursides_perpendicular_flip, powerLeft, powerRight};
+            }
+        }
+
+        else if (navigationStatus == NavigationStatus.ORIENTING) { // State action case for ORIENTING
+            double attitude = robotAttitude[0];
+
+            double targAngle = orientationTarget;
+
+            double angle = targAngle - attitude;
+
+
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
+
+            double powerLeft =  -(angle * steeringGain);
+            double powerRight = (angle * steeringGain);
+
+            if (powerLeft > 0) {
+                powerLeft = Math.min(powerLeft, basePower);
+                powerLeft = Math.max(powerLeft, lowestPower);
+            }
+            else {
+                powerLeft = Math.max(powerLeft, -basePower);
+                powerLeft = Math.min(powerLeft, -lowestPower);
+            }
+
+            if (powerRight > 0) {
+                powerRight = Math.min(powerRight, basePower);
+                powerRight = Math.max(powerRight, lowestPower);
+            }
+            else {
+                powerRight = Math.max(powerRight, -basePower);
+                powerRight = Math.min(powerRight, -lowestPower);
+            }
+
             return new double[]{powerLeft, powerRight};
 
         }
