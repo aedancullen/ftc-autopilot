@@ -7,9 +7,10 @@ import math
 import subprocess
 from subprocess import PIPE
 
+FIELD_FN = "field-grid.gif"
 TITLE = "Autopilot Visualizer: "
 TAG = "AutopilotVisualizerBroadcast"
-PIXELS_PER_INCH = 3.00
+PIXELS_PER_INCH = 500/144
 
 
 def itop(i):
@@ -23,12 +24,23 @@ t.speed(0)
 t.tracer(0,0)
 seth(0)
 rdim = itop(18) / 2
-t.addshape("robot", ((-rdim,-rdim),(0,-rdim/1.5),(rdim,-rdim),(0,rdim)))
+#t.addshape("robot", ((-rdim,-rdim),(0,-rdim/1.5),(rdim,-rdim),(0,rdim)))
+t.addshape("robot", (
+    (-rdim,-rdim),
+    (-rdim, rdim),
+    (-rdim/4,rdim),
+    (0,rdim*1.25),
+    (rdim/4,rdim),
+    (rdim,rdim),
+    (rdim,-rdim)
+    )
+)
 t.shape("robot")
 t.pensize(3)
-t.fillcolor("lightgrey")
+t.fillcolor("lightgray")
 t.pencolor("orange")
 t.title(TITLE + "waiting...")
+t.bgpic(FIELD_FN)
 t.update()
 
 last_status = "running"
