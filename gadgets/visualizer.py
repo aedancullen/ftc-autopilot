@@ -1,3 +1,7 @@
+
+# Extremely quick+basic tool for drawing the robot location graphically.
+# Ensure adb is in the PATH.
+
 import turtle as t
 import math
 import subprocess
@@ -6,7 +10,6 @@ from subprocess import PIPE
 TITLE = "Autopilot Visualizer: "
 TAG = "AutopilotVisualizerBroadcast"
 PIXELS_PER_INCH = 3.00
-
 
 
 def itop(i):
