@@ -8,9 +8,12 @@ import subprocess
 from subprocess import PIPE
 
 FIELD_FN = "field-grid.gif"
+FIELD_X = 500
+FIELD_Y = 500
+FIELD_SCALE = 500
 TITLE = "Autopilot Visualizer: "
 TAG = "AutopilotVisualizerBroadcast"
-PIXELS_PER_INCH = 500/144
+PIXELS_PER_INCH = FIELD_SCALE/144
 
 
 def itop(i):
@@ -40,6 +43,7 @@ t.pensize(3)
 t.fillcolor("lightgray")
 t.pencolor("orange")
 t.title(TITLE + "waiting...")
+t.setup(width=FIELD_X+50, height=FIELD_Y+50)
 t.bgpic(FIELD_FN)
 t.update()
 
