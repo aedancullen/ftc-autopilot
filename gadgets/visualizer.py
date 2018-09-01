@@ -5,14 +5,15 @@
 import turtle as t
 import math
 import subprocess
-from subprocess import PIPE
+import os
+import fcntl
 
 FIELD_FN = "field-grid.gif"
 FIELD_X = 500
 FIELD_Y = 500
 FIELD_SCALE = 500
 TITLE = "Autopilot Visualizer: "
-TAG = "AutopilotVisualizerBroadcast"
+TAG = b"AutopilotVisualizerBroadcast"
 PIXELS_PER_INCH = FIELD_SCALE/144
 
 
@@ -67,13 +68,28 @@ def update(status, x, y, h):
     last_status = status
     t.update()
 
-logcat = subprocess.Popen(["adb", "logcat"], stdout=PIPE)
-while True:
-    line = logcat.stdout.readline()
-    if not line:
-        break
-    if TAG in line:
-        line = line[line.find(TAG):]
-        line = line.split(" ")[1]
-        status, x, y, h = line.split(",")
-        update(status, float(x),float(y),float(h))
+
+logcat = subprocess.Popen(["adb", "logcat"], stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout
+flag = fcntl.fcntl(logcat, fcntl.F_GETFL)
+fcntl.fcntl(logcat, fcntl.F_SETFL, flag | os.O_NONBLOCK)
+
+def check_logcat():
+    global logcat
+
+    while True:
+        try:
+            line = os.read(logcat.fileno(), 1024)
+        except Exception as e:
+            t.ontimer(check_logcat, 15)
+            return
+        if TAG in line:
+            line = line[line.find(TAG):]
+            line = line.split(b" ")[1]
+            status, x, y, h = line.split(b",")
+            update(status, float(x),float(y),float(h))
+
+    t.ontimer(check_logcat, 15)
+
+
+t.ontimer(check_logcat, 15)
+t.mainloop()
