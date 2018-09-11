@@ -52,10 +52,10 @@ last_status = "running"
 def update(status, x, y, h):
     global last_status
 
-    if last_status == "stopped" and status == "running":
+    if last_status == "stopped" and (status == "running" or status == "orienting"):
         t.clear()
 
-    if last_status == "running":
+    if last_status == "running" or last_Status == "orienting":
         t.pd()
     else:
         t.pu()
