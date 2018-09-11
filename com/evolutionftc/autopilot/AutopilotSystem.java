@@ -103,18 +103,20 @@ public class AutopilotSystem {
                                 host.getRobotAttitude(),
                                 host.getRobotPosition()) == false)
         {
-            AutopilotSegment newSegment = pathFollower.moveOnFailure();
-            onSegmentTransition(currentSegment, newSegment, false);
-            currentSegment = newSegment;
-            if (currentSegment != null) {
-                host.setNavigationTarget(currentSegment);
-                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
-                host.communicate(tracker);
-                return host.navigationTickDifferential();
-            }
-            else {
-                return new double[2];
-            }
+            while (shouldContinue(currentSegment,
+                                host.getRobotAttitude(),
+                                host.getRobotPosition()) == false) {
+            	AutopilotSegment newSegment = pathFollower.moveOnFailure();
+            	onSegmentTransition(currentSegment, newSegment, false);
+            	currentSegment = newSegment;
+            	if (currentSegment == null) {
+                    return new double[3];
+            	}
+            	host.setNavigationTarget(currentSegment);
+            	host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
+            	host.communicate(tracker);
+	    }
+            return host.navigationTickDifferential();
         }
         else {
             return res;
@@ -164,18 +166,20 @@ public class AutopilotSystem {
                                 host.getRobotAttitude(),
                                 host.getRobotPosition()) == false)
         {
-            AutopilotSegment newSegment = pathFollower.moveOnFailure();
-            onSegmentTransition(currentSegment, newSegment, false);
-            currentSegment = newSegment;
-            if (currentSegment != null) {
-                host.setNavigationTarget(currentSegment);
-                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
-                host.communicate(tracker);
-                return host.navigationTickFoursides();
-            }
-            else {
-                return new double[3];
-            }
+            while (shouldContinue(currentSegment,
+                                host.getRobotAttitude(),
+                                host.getRobotPosition()) == false) {
+            	AutopilotSegment newSegment = pathFollower.moveOnFailure();
+            	onSegmentTransition(currentSegment, newSegment, false);
+            	currentSegment = newSegment;
+            	if (currentSegment == null) {
+                    return new double[3];
+            	}
+            	host.setNavigationTarget(currentSegment);
+            	host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
+            	host.communicate(tracker);
+	    }
+            return host.navigationTickFoursides();
         }
         else {
             return res;
