@@ -13,7 +13,7 @@ FIELD_X = 500
 FIELD_Y = 500
 FIELD_SCALE = 500
 TITLE = "Autopilot Visualizer: "
-TAG = b"AutopilotVisualizerBroadcast"
+TAG = b"AutopilotVisBcast"
 PIXELS_PER_INCH = FIELD_SCALE/144
 
 

@@ -2,6 +2,7 @@ package com.evolutionftc.autopilot;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -58,7 +59,7 @@ public class AutopilotSystem {
 		double robotY = broadcastHost.getRobotPosition()[1];
 		double robotH = broadcastHost.getRobotAttitude()[0];
 
-		Log.v("AutopilotVisualizerBroadcast", status+","+robotX+","+robotY+","+robotH);
+		Log.v("AutopilotVisBcast", status+","+robotX+","+robotY+","+robotH);
     }
 
     public double[] systemTickDifferential() {
@@ -146,7 +147,7 @@ public class AutopilotSystem {
 
         telemetry.update();
 
-        double[] res = host.navigationTickFoursidesl();
+        double[] res = host.navigationTickFoursides();
 
         if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
             AutopilotSegment newSegment = pathFollower.moveOnSuccess();
