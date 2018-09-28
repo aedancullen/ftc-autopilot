@@ -42,7 +42,7 @@ public class AutopilotHost {
 
     private double[] robotPosition = new double[3];
 
-    private boolean[] navigationTargetInverts = new double[3];
+    private boolean[] navigationTargetInverts = null;
     private boolean orientationTargetInvert = false;
 
     public AutopilotHost(Telemetry telemetry) {
@@ -57,7 +57,7 @@ public class AutopilotHost {
         this.orientationTargetInvert = orientationTargetInvert;
     }
 
-    public void getNavigationTargetInverts() {
+    public boolean[] getNavigationTargetInverts() {
         return this.navigationTargetInverts;
     }
 
@@ -129,7 +129,7 @@ public class AutopilotHost {
         this.powerGainX = (basePower - lowestPower) / navigationHalfwayX;
         this.powerGainY = (basePower - lowestPower) / navigationHalfwayY;
 
-        if (this.navigationTargetInverts) {
+        if (this.navigationTargetInverts != null) {
             this.applyNavigationTargetInverts();
         }
 
@@ -397,7 +397,10 @@ public class AutopilotHost {
                 powerRight = Math.max(powerRight, chosenPower);
                 powerLeft = Math.min(powerLeft, -chosenPower);
                 powerRight = Math.min(powerRight, -chosenPower);
-                return new double[]{foursides_perpendicular_flip, powerLeft, powerRight};
+
+                double b_foursides_perpendicular_flip = 0;
+                if (foursides_perpendicular_flip) {b_foursides_perpendicular_flip = 1;}
+                return new double[]{b_foursides_perpendicular_flip, powerLeft, powerRight};
             }
         }
 
