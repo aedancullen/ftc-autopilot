@@ -493,23 +493,34 @@ public class AutopilotHost {
             }
 
             double attitude = robotAttitude[0];
-            double targAngle = -Math.atan(distX / distY);
+            double translateTargAngle = -Math.atan(distX / distY);
             if (distY < 0) {
-                targAngle += Math.PI;
+                translateTargAngle += Math.PI;
             }
 
-            double angle = targAngle - attitude;
+            double translateAngle = translateTargAngle - attitude;
 
 
-            if (angle > Math.PI) {
-                angle = -(Math.PI * 2 - angle);
+            if (translateAngle > Math.PI) {
+                translateAngle = -(Math.PI * 2 - translateAngle);
             }
-            if (angle < -Math.PI) {
-                angle = -(-Math.PI * 2 - angle);
+            if (translateAngle < -Math.PI) {
+                translateAngle = -(-Math.PI * 2 - translateAngle);
+            }
+
+            double rotateTargAngle = orientationTarget;
+
+            double rotateAngle = rotateTargAngle - attitude;
+
+            if (rotateAngle > Math.PI) {
+                rotateAngle = -(Math.PI * 2 - rotateAngle);
+            }
+            if (rotateAngle < -Math.PI) {
+                rotateAngle = -(-Math.PI * 2 - rotateAngle);
             }
 
 
-            double powerRot = -(angle * steeringGain); // positive is clockwise
+            double powerRot = -(rotateAngle * steeringGain); // positive is clockwise
             double powerY = 0;
             double powerX = 0;
 
@@ -525,8 +536,8 @@ public class AutopilotHost {
 
             if (navigationStatus == navigationStatus.RUNNING) {
                 double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
-                powerY = Math.cos(angle) * chosenPower;
-                powerX = -Math.sin(angle) * chosenPower;
+                powerY = Math.cos(translateAngle) * chosenPower;
+                powerX = -Math.sin(translateAngle) * chosenPower;
             }
 
             return new double[]{powerX, powerY, powerRot};
