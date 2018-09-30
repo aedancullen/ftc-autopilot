@@ -450,4 +450,93 @@ public class AutopilotHost {
 
     }
 
+
+    public double[] navigationTick() {
+
+        if (
+                hasReached(robotPosition[0], navigationTarget[0], accuracyThreshold[0]) &&
+                        hasReached(robotPosition[1], navigationTarget[1], accuracyThreshold[1]) &&
+                        hasReached(robotPosition[2], navigationTarget[2], accuracyThreshold[2]) &&
+                        navigationStatus == NavigationStatus.RUNNING
+                )
+        {
+            if (useOrientation) {
+                navigationStatus = NavigationStatus.ORIENTING;
+                nTimesStable = 0;
+            }
+            else {
+                navigationStatus = NavigationStatus.STOPPED;
+            }
+        }
+
+
+        else if (navigationStatus == NavigationStatus.ORIENTING) {
+            if (hasReached(Math.abs(robotAttitude[0]), Math.abs(orientationTarget), orientationThreshold)) {nTimesStable++;}
+            if (nTimesStable > 3) {
+                navigationStatus = NavigationStatus.STOPPED;
+            }
+        }
+
+
+        if (navigationStatus != NavigationStatus.STOPPED) {
+            double distX = navigationTarget[0] - robotPosition[0];
+            double distY = navigationTarget[1] - robotPosition[1];
+            double dist = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+            double powerAdj = (dist - navigationHalfway) * powerGain;
+            if (powerAdj > 0 && !rampUp) {
+                powerAdj = 0;
+            }
+            if (powerAdj < 0 && !rampDown) {
+                powerAdj = 0;
+            } else if (powerAdj < 0 && rampDown) {
+                powerAdj *= -1;
+            }
+
+            double attitude = robotAttitude[0];
+            double targAngle = -Math.atan(distX / distY);
+            if (distY < 0) {
+                targAngle += Math.PI;
+            }
+
+            double angle = targAngle - attitude;
+
+
+            if (angle > Math.PI) {
+                angle = -(Math.PI * 2 - angle);
+            }
+            if (angle < -Math.PI) {
+                angle = -(-Math.PI * 2 - angle);
+            }
+
+
+            double powerRot = -(angle * steeringGain); // positive is clockwise
+            double powerY = 0;
+            double powerX = 0;
+
+            if (powerRot > 0) {
+                powerRot = Math.min(powerRot, basePower);
+                powerRot = Math.max(powerRot, lowestPower);
+            }
+            else {
+                powerRot = Math.max(powerRot, -basePower);
+                powerRot = Math.min(powerRot, -lowestPower);
+            }
+
+
+            if (navigationStatus == navigationStatus.RUNNING) {
+                double chosenPower = Math.min((-basePower + powerAdj), -lowestPower);
+                powerY = Math.cos(angle) * chosenPower;
+                powerX = -Math.sin(angle) * chosenPower;
+            }
+
+            return new double[]{powerX, powerY, powerRot};
+
+        }
+
+        else {
+            return new double[3];
+        }
+
+    }
+
 }

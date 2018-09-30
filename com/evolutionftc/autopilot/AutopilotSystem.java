@@ -179,8 +179,72 @@ public class AutopilotSystem {
             	host.setNavigationTarget(currentSegment);
             	host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
             	host.communicate(tracker);
-	    }
+	        }
             return host.navigationTickFoursides();
+        }
+        else {
+            return res;
+        }
+
+    }
+
+
+    public double[] systemTick() {
+        long timeNow = System.currentTimeMillis();
+        if (visualizerBroadcastEnabled &&
+                timeNow - msAtLastBroadcast > VISUALIZER_BROADCAST_INTERVAL_MS)
+        {
+            this.doVisualizerBroadcast(host);
+            msAtLastBroadcast = timeNow;
+        }
+
+        host.communicate(tracker);
+
+        host.telemetryUpdate();
+
+        if (pathFollower == null) {
+            telemetry.update();
+            return new double[3];
+        }
+
+        pathFollower.telemetryUpdate();
+
+        telemetry.update();
+
+        double[] res = host.navigationTick();
+
+        if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
+            AutopilotSegment newSegment = pathFollower.moveOnSuccess();
+            onSegmentTransition(currentSegment, newSegment, true);
+            currentSegment = newSegment;
+            if (currentSegment != null) {
+                host.setNavigationTarget(currentSegment);
+                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
+                host.communicate(tracker);
+                return host.navigationTick();
+            }
+            else {
+                return new double[3];
+            }
+        }
+        else if (shouldContinue(currentSegment,
+                host.getRobotAttitude(),
+                host.getRobotPosition()) == false)
+        {
+            while (shouldContinue(currentSegment,
+                    host.getRobotAttitude(),
+                    host.getRobotPosition()) == false) {
+                AutopilotSegment newSegment = pathFollower.moveOnFailure();
+                onSegmentTransition(currentSegment, newSegment, false);
+                currentSegment = newSegment;
+                if (currentSegment == null) {
+                    return new double[3];
+                }
+                host.setNavigationTarget(currentSegment);
+                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
+                host.communicate(tracker);
+            }
+            return host.navigationTick();
         }
         else {
             return res;
