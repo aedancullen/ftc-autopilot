@@ -440,12 +440,12 @@ public class AutopilotHost {
                 powerRight = Math.min(powerRight, -lowestPower);
             }
 
-            return new double[]{powerLeft, powerRight};
+            return new double[]{0, powerLeft, powerRight};
 
         }
 
         else { // Navigation status must be STOPPED
-            return new double[2];
+            return new double[3];
         }
 
     }
