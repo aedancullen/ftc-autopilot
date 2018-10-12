@@ -176,6 +176,9 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
 	public void setRobotPosition(double[] position) {
 		robotPosition = position;
+		for (int i=0; i<3; i++) {
+			robotPosition[i] += sensorPosRelativeToRobot[i];
+		}
 	}
 
 	public void setRobotAttitude(double[] attitude) {
