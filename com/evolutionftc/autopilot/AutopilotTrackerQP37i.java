@@ -24,7 +24,7 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 	long yenc;
 	double ticksPerUnit;
 
-	private BNO055IMU imu;
+	public BNO055IMU imu;
 
 	int nSubsteps;
 
