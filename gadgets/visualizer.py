@@ -12,7 +12,7 @@ FIELD_FN = "field-grid.gif"
 FIELD_X = 500
 FIELD_Y = 500
 FIELD_SCALE = 500
-TITLE = "Autopilot Visualizer: "
+TITLE = b"Autopilot Visualizer: "
 TAG = b"AutopilotVisBcast"
 PIXELS_PER_INCH = FIELD_SCALE/144
 
@@ -43,7 +43,7 @@ t.shape("robot")
 t.pensize(3)
 t.fillcolor("lightgray")
 t.pencolor("orange")
-t.title(TITLE + "waiting...")
+t.title(TITLE + b"waiting...")
 t.setup(width=FIELD_X+50, height=FIELD_Y+50)
 t.bgpic(FIELD_FN)
 t.update()
@@ -85,6 +85,7 @@ def check_logcat():
         if TAG in line:
             line = line[line.find(TAG):]
             line = line.split(b" ")[1]
+            line = line.split(b"\r\n")[0]
             status, x, y, h = line.split(b",")
             update(status, float(x),float(y),float(h))
 
