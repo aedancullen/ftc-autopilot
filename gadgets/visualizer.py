@@ -48,14 +48,14 @@ t.setup(width=FIELD_X+50, height=FIELD_Y+50)
 t.bgpic(FIELD_FN)
 t.update()
 
-last_status = "stopped"
+last_status = b"running"
 def update(status, x, y, h):
     global last_status
 
-    if last_status == "stopped" and (status == "running" or status == "orienting"):
+    if last_status == b"stopped" and (status == b"running" or status == b"orienting"):
         t.clear()
 
-    if last_status == "running" or last_status == "orienting":
+    if last_status == b"running" or last_status == b"orienting":
         t.pd()
     else:
         t.pu()
@@ -85,12 +85,12 @@ def check_logcat():
         if TAG in line:
             try:
                 line = line[line.find(TAG):]
-                line = line.split(b" ")[1]
                 line = line.split(b"\r\n")[0]
+                line = line.split(b" ")[1]
                 status, x, y, h = line.split(b",")
+                update(status, float(x),float(y),float(h))
             except:
                 pass
-            update(status, float(x),float(y),float(h))
 
     t.ontimer(check_logcat, 15)
 
