@@ -520,16 +520,24 @@ public class AutopilotHost {
             }
 
 
-            double powerRot = -(rotateAngle * steeringGain); // positive is clockwise
+            double powerRot = 0;
             double powerY = 0;
             double powerX = 0;
 
-            powerRot = Math.min(powerRot, basePower);
-            powerRot = Math.max(powerRot, -basePower);
-
+            if (navigationStatus == navigationStatus.ORIENTING) {
+                powerRot = -(rotateAngle * steeringGain); // positive is clockwise
+                if (powerRot > 0) {
+                    powerRot = Math.min(powerRot, basePower);
+                    powerRot = Math.max(powerRot, lowestPower);
+                }
+                else {
+                    powerRot = Math.max(powerRot, -basePower);
+                    powerRot = Math.min(powerRot, -lowestPower);
+                }
+            }
 
             if (navigationStatus == navigationStatus.RUNNING) {
-                double chosenPower = Math.min((basePower - powerAdj), lowestPower);
+                double chosenPower = Math.max((basePower - powerAdj), lowestPower);
                 powerY = Math.cos(translateAngle) * chosenPower;
                 powerX = -Math.sin(translateAngle) * chosenPower;
             }
