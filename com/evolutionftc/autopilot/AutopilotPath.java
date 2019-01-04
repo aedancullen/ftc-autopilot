@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-// Copyright (c) 2016-2018 Aedan Cullen and/or Evolution Robotics.
+// Copyright (c) 2016-2019 Aedan Cullen and/or Evolution Robotics.
 
 
 public class AutopilotPath {
@@ -40,7 +40,7 @@ public class AutopilotPath {
             String header = pathReader.readLine();
             String line = pathReader.readLine();
             if (!header.toLowerCase().equals(
-            "id,success,fail,targetx,targety,targetz,targetorientation,steeringgain,accuracyx,accuracyy,accuracyz,accuracyorientation,basepower,lowestpower,rampup,rampdown,useorientation")){
+            "id,success,fail,targetx,targety,targeth,xygain,hgain,xymax,xymin,hmax,useh")){
                 throw new UnsupportedOperationException("Header line in CSV indicates file unparseable, is it of the correct format?");
             }
             while (line != null) {
@@ -52,21 +52,19 @@ public class AutopilotPath {
                 newSegment.navigationTarget = new double[] {
                     Double.valueOf(lineSegments[3]),
                     Double.valueOf(lineSegments[4]),
-                    Double.valueOf(lineSegments[5])
+                    0.0
                 };
-                newSegment.orientationTarget = Double.valueOf(lineSegments[6]);
-                newSegment.steeringGain = Double.valueOf(lineSegments[7]);
-                newSegment.accuracyThreshold = new double[] {
-                    Double.valueOf(lineSegments[8]),
-                    Double.valueOf(lineSegments[9]),
-                    Double.valueOf(lineSegments[10])
-                };
-                newSegment.orientationThreshold = Double.valueOf(lineSegments[11]);
-                newSegment.basePower = Double.valueOf(lineSegments[12]);
-                newSegment.lowestPower = Double.valueOf(lineSegments[13]);
-                newSegment.rampUp = Boolean.valueOf(lineSegments[14]);
-                newSegment.rampDown = Boolean.valueOf(lineSegments[15]);
-                newSegment.useOrientation = Boolean.valueOf(lineSegments[16]);
+                newSegment.orientationTarget = Double.valueOf(lineSegments[5]);
+
+                newSegment.navigationGain = Double.valueOf(lineSegments[6]);
+                newSegment.orientationGain = Double.valueOf(lineSegments[7]);
+
+                newSegment.navigationMax = Double.valueOf(lineSegments[8]);
+                newSegment.navigationMin = Double.valueOf(lineSegments[9]);
+
+                newSegment.orientationMax = Double.valueOf(lineSegments[10]);
+                newSegment.useOrientation = Boolean.valueOf(lineSegments[11]);
+                
                 pathSegments.add(newSegment);
                 line = pathReader.readLine();
             }

@@ -1,7 +1,7 @@
 package com.evolutionftc.autopilot;
 
 
-// Copyright (c) 2016-2018 Aedan Cullen and/or Evolution Robotics.
+// Copyright (c) 2016-2019 Aedan Cullen and/or Evolution Robotics.
 
 
 public class AutopilotSegment {
@@ -11,15 +11,13 @@ public class AutopilotSegment {
 
     public double[] navigationTarget;
     public double orientationTarget;
-    public double steeringGain;
-    public double[] accuracyThreshold;
-    public double orientationThreshold;
-    public double basePower;
-    public double lowestPower;
-    public boolean rampUp;
-    public boolean rampDown;
+    public double navigationGain;
+    public double orientationGain;
+    public double navigationMax;
+    public double navigationMin;
+    public double orientationMax;
     public boolean useOrientation;
-
+    
     public void populateFromOther(AutopilotSegment other) {
         //this.id = other.id;
         //this.success = other.success;
@@ -27,13 +25,11 @@ public class AutopilotSegment {
 
         this.navigationTarget = other.navigationTarget;
         this.orientationTarget = other.orientationTarget;
-        this.steeringGain = other.steeringGain;
-        this.accuracyThreshold = other.accuracyThreshold;
-        this.orientationThreshold = other.orientationThreshold;
-        this.basePower = other.basePower;
-        this.lowestPower = other.lowestPower;
-        this.rampUp = other.rampUp;
-        this.rampDown = other.rampDown;
+        this.navigationGain = other.navigationGain;
+        this.orientationGain = other.orientationGain;
+        this.navigationMax = other.navigationMax;
+        this.navigationMin = other.navigationMin;
+        this.orientationMax = other.orientationMax;
         this.useOrientation = other.useOrientation;
     }
 }

@@ -6,10 +6,8 @@ import android.util.Log;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import java.io.IOException;
 
-
-// Copyright (c) 2016-2018 Aedan Cullen and/or Evolution Robotics.
+// Copyright (c) 2016-2019 Aedan Cullen and/or Evolution Robotics.
 
 
 public class AutopilotSystem {
@@ -60,132 +58,6 @@ public class AutopilotSystem {
 		double robotH = broadcastHost.getRobotAttitude()[0];
 
 		Log.v("AutopilotVisBcast", status+","+robotX+","+robotY+","+robotH);
-    }
-
-    public double[] systemTickDifferential() {
-		long timeNow = System.currentTimeMillis();
-		if (visualizerBroadcastEnabled &&
-	    	timeNow - msAtLastBroadcast > VISUALIZER_BROADCAST_INTERVAL_MS)
-		{
-			this.doVisualizerBroadcast(host);
-			msAtLastBroadcast = timeNow;
-		}
-
-        host.communicate(tracker);
-
-        host.telemetryUpdate();
-
-        if (pathFollower == null) {
-            telemetry.update();
-            return new double[2];
-        }
-
-        pathFollower.telemetryUpdate();
-
-        telemetry.update();
-
-        double[] res = host.navigationTickDifferential();
-
-        if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
-            AutopilotSegment newSegment = pathFollower.moveOnSuccess();
-            onSegmentTransition(currentSegment, newSegment, true);
-            currentSegment = newSegment;
-            if (currentSegment != null) {
-                host.setNavigationTarget(currentSegment);
-                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
-                host.communicate(tracker);
-                return host.navigationTickDifferential();
-            }
-            else {
-                return new double[2];
-            }
-        }
-        else if (shouldContinue(currentSegment,
-                                host.getRobotAttitude(),
-                                host.getRobotPosition()) == false)
-        {
-            while (shouldContinue(currentSegment,
-                                host.getRobotAttitude(),
-                                host.getRobotPosition()) == false) {
-            	AutopilotSegment newSegment = pathFollower.moveOnFailure();
-            	onSegmentTransition(currentSegment, newSegment, false);
-            	currentSegment = newSegment;
-            	if (currentSegment == null) {
-                    return new double[3];
-            	}
-            	host.setNavigationTarget(currentSegment);
-            	host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
-            	host.communicate(tracker);
-	    }
-            return host.navigationTickDifferential();
-        }
-        else {
-            return res;
-        }
-
-    }
-
-	public double[] systemTickFoursides() {
-		long timeNow = System.currentTimeMillis();
-		if (visualizerBroadcastEnabled &&
-	    	timeNow - msAtLastBroadcast > VISUALIZER_BROADCAST_INTERVAL_MS)
-		{
-			this.doVisualizerBroadcast(host);
-			msAtLastBroadcast = timeNow;
-		}
-
-        host.communicate(tracker);
-
-        host.telemetryUpdate();
-
-        if (pathFollower == null) {
-            telemetry.update();
-            return new double[3];
-        }
-
-        pathFollower.telemetryUpdate();
-
-        telemetry.update();
-
-        double[] res = host.navigationTickFoursides();
-
-        if (host.getNavigationStatus() == AutopilotHost.NavigationStatus.STOPPED) {
-            AutopilotSegment newSegment = pathFollower.moveOnSuccess();
-            onSegmentTransition(currentSegment, newSegment, true);
-            currentSegment = newSegment;
-            if (currentSegment != null) {
-                host.setNavigationTarget(currentSegment);
-                host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
-                host.communicate(tracker);
-                return host.navigationTickFoursides();
-            }
-            else {
-                return new double[3];
-            }
-        }
-        else if (shouldContinue(currentSegment,
-                                host.getRobotAttitude(),
-                                host.getRobotPosition()) == false)
-        {
-            while (shouldContinue(currentSegment,
-                                host.getRobotAttitude(),
-                                host.getRobotPosition()) == false) {
-            	AutopilotSegment newSegment = pathFollower.moveOnFailure();
-            	onSegmentTransition(currentSegment, newSegment, false);
-            	currentSegment = newSegment;
-            	if (currentSegment == null) {
-                    return new double[3];
-            	}
-            	host.setNavigationTarget(currentSegment);
-            	host.setNavigationStatus(AutopilotHost.NavigationStatus.RUNNING);
-            	host.communicate(tracker);
-	        }
-            return host.navigationTickFoursides();
-        }
-        else {
-            return res;
-        }
-
     }
 
 

@@ -1,7 +1,7 @@
 package com.evolutionftc.autopilot;
 
 
-// Copyright (c) 2016-2018 Aedan Cullen and/or Evolution Robotics.
+// Copyright (c) 2016-2019 Aedan Cullen and/or Evolution Robotics.
 
 
 // Encoder + IMU (dead-reckoning) tracker
