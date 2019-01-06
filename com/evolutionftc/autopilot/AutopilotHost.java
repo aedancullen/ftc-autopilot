@@ -134,6 +134,8 @@ public class AutopilotHost {
             this.applyOrientationTargetInvert();
         }
 
+        lastRobotPosition = null;
+
     }
 
     public double[] getNavigationTarget() {
@@ -150,6 +152,8 @@ public class AutopilotHost {
 
     public void setRobotPosition(double[] position) {
         robotPosition = position;
+
+        lastRobotPosition = null;
     }
 
     private static boolean hasReached(double param1, double param2, double threshold) {
@@ -161,25 +165,58 @@ public class AutopilotHost {
         return roundOff;
     }
 
+
+    double lastTranslateTargAngle;
+    double[] lastRobotPosition;
+
+    private void updateLasts(double translateTargAngle) {
+        lastTranslateTargAngle = translateTargAngle;
+        lastRobotPosition = robotPosition;
+    }
+
+
+    private double compensateDeviations(double plainTargAngle) {
+        if (lastRobotPosition == null) {return plainTargAngle;}
+
+        double movedX = robotPosition[0] - lastRobotPosition[0];
+        double movedY = robotPosition[1] - lastRobotPosition[1];
+        double movedAngle = -Math.tan(movedX / movedY);
+        if (movedY < 0) {movedAngle += Math.PI;}
+
+        double deviatedAngle = movedAngle - lastTranslateTargAngle;
+        return plainTargAngle - deviatedAngle;
+    }
+
+
     public double[] navigationTick() {
 
         if (navigationStatus == NavigationStatus.STOPPED) {
             return new double[3];
         }
 
-        double hErr = Math.asin(Math.sin(robotAttitude[0] - orientationTarget));
-        if (Math.cos(robotAttitude[0]) < 0) {
-            if (Math.sin(robotAttitude[0]) > 0) {hErr = Math.PI / 2.0;} else {hErr = -Math.PI / 2.0;}
+        double hErr = Math.asin(Math.sin(orientationTarget - robotAttitude[0]));
+        if (Math.cos(orientationTarget - robotAttitude[0]) < 0) {
+            if (Math.sin(orientationTarget - robotAttitude[0]) > 0) {hErr = 2*Math.PI - hErr;} else {hErr = -2*Math.PI - hErr;}
         }
 
         double xErr = navigationTarget[0] - robotPosition[0];
         double yErr = navigationTarget[1] - robotPosition[1];
 
-        double hCorr = Math.min(orientationMax, hErr * orientationGain);
+        double hCorr = Math.max(-orientationMax, Math.min(orientationMax, hErr * orientationGain));
 
-        double xCorr = Math.min(navigationMax, Math.max(navigationMin, xErr * navigationGain));
-        double yCorr = Math.min(navigationMax, Math.max(navigationMin, yErr * navigationGain));
+        double translateTargAngle = -Math.atan(xErr / yErr);
+        if (yErr < 0) {translateTargAngle += Math.PI;}
 
+        translateTargAngle = compensateDeviations(translateTargAngle);
+
+        double finalAngle = translateTargAngle - robotAttitude[0];
+
+
+        double distance = Math.sqrt(Math.pow(xErr, 2) + Math.pow(yErr, 2));
+        double chosenPower = Math.max(navigationMin, Math.min(navigationMax, distance * navigationGain));
+
+        double xCorr = chosenPower * -Math.sin(finalAngle);
+        double yCorr = chosenPower * Math.cos(finalAngle);
 
         if (
                 hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
@@ -199,7 +236,8 @@ public class AutopilotHost {
         }
 
 
-        
+        updateLasts(translateTargAngle);
+
         if (useOrientation) {
             return new double[] {yCorr, xCorr, hCorr};
         }
