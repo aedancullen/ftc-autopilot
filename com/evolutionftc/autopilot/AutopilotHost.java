@@ -21,11 +21,11 @@ public class AutopilotHost {
 
     private NavigationStatus navigationStatus = NavigationStatus.STOPPED;
 
-    public double countsToStable;
+    public int countsToStable;
     public double navigationUnitsToStable;
     public double orientationUnitsToStable;
 
-    public double[] navigationTarget;
+    public double[] navigationTarget = new double[3];
     public double orientationTarget;
     public double navigationGain;
     public double orientationGain;
@@ -45,7 +45,7 @@ public class AutopilotHost {
         this.telemetry = telemetry;
     }
 
-    public void setCountsToStable(double countsToStable) {
+    public void setCountsToStable(int countsToStable) {
         this.countsToStable = countsToStable;
     }
 
