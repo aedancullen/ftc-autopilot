@@ -20,6 +20,9 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 	private DcMotor x;
 	private DcMotor y;
 
+	public boolean invertX;
+	public boolean invertY;
+
 	long xenc;
 	long yenc;
 	double ticksPerUnit;
@@ -121,6 +124,11 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 		//imu.initialize(parameters);
 	}
 
+	public void setInverts(boolean invertX, boolean invertY) {
+		this.invertX = invertX;
+		this.invertY = invertY;
+	}
+
 
 	public void update() {
 
@@ -140,6 +148,9 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
 		xenc = ticksX;
 		yenc = ticksY;
+
+		if (invertX) {xval = -xval;}
+		if (invertY) {yval = -yval;}
 
 		double[] translationDeltaPerStep = {xval / (double)nSubsteps, yval / (double)nSubsteps, 0.0};
 		double[] rotationDeltaPerStep = new double[3];

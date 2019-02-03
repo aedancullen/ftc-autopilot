@@ -51,13 +51,24 @@ public class AutopilotSystem {
         return true;
     }
 
-    private void doVisualizerBroadcast(AutopilotHost broadcastHost) {
+    private static void doVisualizerBroadcast(AutopilotHost broadcastHost) {
 		String status = broadcastHost.getNavigationStatus().toString().toLowerCase();
 		double robotX = broadcastHost.getRobotPosition()[0];
 		double robotY = broadcastHost.getRobotPosition()[1];
 		double robotH = broadcastHost.getRobotAttitude()[0];
 
 		Log.v("AutopilotVisBcast", status+","+robotX+","+robotY+","+robotH);
+    }
+
+    private static long staticMsAtLastBroadcast;
+
+    public static void visualizerBroadcastRoutine(AutopilotHost broadcastHost) {
+        long timeNow = System.currentTimeMillis();
+        if (timeNow - staticMsAtLastBroadcast > VISUALIZER_BROADCAST_INTERVAL_MS)
+        {
+            doVisualizerBroadcast(broadcastHost);
+            staticMsAtLastBroadcast = timeNow;
+        }
     }
 
 
