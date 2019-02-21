@@ -4,6 +4,8 @@ package com.evolutionftc.autopilot;
 
 
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.PwmControl;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -180,6 +182,7 @@ public class AutopilotHost {
 
         double movedX = robotPosition[0] - lastRobotPosition[0];
         double movedY = robotPosition[1] - lastRobotPosition[1];
+        if (movedX == 0 || movedY == 0) {return plainTargAngle;}
         double movedAngle = -Math.tan(movedX / movedY);
         if (movedY < 0) {movedAngle += Math.PI;}
 
@@ -207,7 +210,7 @@ public class AutopilotHost {
         double translateTargAngle = -Math.atan(xErr / yErr);
         if (yErr < 0) {translateTargAngle += Math.PI;}
 
-        translateTargAngle = compensateDeviations(translateTargAngle);
+        //translateTargAngle = compensateDeviations(translateTargAngle);
 
         double finalAngle = translateTargAngle - robotAttitude[0];
 
@@ -218,15 +221,29 @@ public class AutopilotHost {
         double xCorr = chosenPower * -Math.sin(finalAngle);
         double yCorr = chosenPower * Math.cos(finalAngle);
 
-        if (
-                hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
-                && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)
-                && hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable)
-        ) {
-            nTimesStable++;
+
+        if (useOrientation) {
+            if (
+                    hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
+                            && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)
+                            && hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable)
+            ) {
+                nTimesStable++;
+            }
+            else {
+                nTimesStable = 0;
+            }
         }
         else {
-            nTimesStable = 0;
+            if (
+                    hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
+                            && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)
+            ) {
+                nTimesStable++;
+            }
+            else {
+                nTimesStable = 0;
+            }
         }
 
 
@@ -237,6 +254,16 @@ public class AutopilotHost {
 
 
         updateLasts(translateTargAngle);
+
+        if (hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
+                && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)) {
+            xCorr = 0;
+            yCorr = 0;
+        }
+
+        if (hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable)) {
+            hCorr = 0;
+        }
 
         if (useOrientation) {
             return new double[] {yCorr, xCorr, hCorr};
