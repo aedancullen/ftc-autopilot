@@ -17,6 +17,8 @@ public class AutopilotSegment {
     public double navigationMin;
     public double orientationMax;
     public boolean useOrientation;
+
+    public boolean useTranslation = true;
     
     public void populateFromOther(AutopilotSegment other) {
         //this.id = other.id;
@@ -31,5 +33,6 @@ public class AutopilotSegment {
         this.navigationMin = other.navigationMin;
         this.orientationMax = other.orientationMax;
         this.useOrientation = other.useOrientation;
+        this.useTranslation = other.useTranslation;
     }
 }

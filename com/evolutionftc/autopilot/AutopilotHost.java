@@ -35,6 +35,7 @@ public class AutopilotHost {
     public double navigationMin;
     public double orientationMax;
     public boolean useOrientation;
+    public boolean useTranslation;
 
     private double[] robotAttitude = new double[3];
 
@@ -103,7 +104,7 @@ public class AutopilotHost {
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
-        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.navigationGain, target.orientationGain, target.navigationMax, target.navigationMin, target.orientationMax, target.useOrientation);
+        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.navigationGain, target.orientationGain, target.navigationMax, target.navigationMin, target.orientationMax, target.useOrientation, target.useTranslation);
     }
 
     private void applyOrientationTargetInvert() {
@@ -118,7 +119,7 @@ public class AutopilotHost {
         }
     }
 
-    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double navigationGain, double orientationGain, double navigationMax, double navigationMin, double orientationMax, boolean useOrientation) {
+    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double navigationGain, double orientationGain, double navigationMax, double navigationMin, double orientationMax, boolean useOrientation, boolean useTranslation) {
         this.navigationTarget = navigationTarget;
         this.orientationTarget = orientationTarget;
         this.navigationGain = navigationGain;
@@ -127,6 +128,7 @@ public class AutopilotHost {
         this.navigationMin = navigationMin;
         this.orientationMax = orientationMax;
         this.useOrientation = useOrientation;
+        this.useTranslation = useTranslation;
 
         if (this.navigationTargetInverts != null) {
             this.applyNavigationTargetInverts();
@@ -222,30 +224,22 @@ public class AutopilotHost {
         double yCorr = chosenPower * Math.cos(finalAngle);
 
 
+        boolean boolReached = true;
+
         if (useOrientation) {
-            if (
-                    hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
-                            && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)
-                            && hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable)
-            ) {
-                nTimesStable++;
-            }
-            else {
-                nTimesStable = 0;
-            }
+            boolReached = boolReached && hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable);
         }
-        else {
-            if (
-                    hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
-                            && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)
-            ) {
-                nTimesStable++;
-            }
-            else {
-                nTimesStable = 0;
-            }
+        if (useTranslation) {
+            boolReached = boolReached && hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
+                    && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable);
         }
 
+        if (boolReached) {
+            nTimesStable++;
+        }
+        else {
+            nTimesStable = 0;
+        }
 
 
         if (nTimesStable > countsToStable) {
@@ -265,12 +259,17 @@ public class AutopilotHost {
             hCorr = 0;
         }
 
+        double[] ret = new double[3];
+
         if (useOrientation) {
-            return new double[] {yCorr, xCorr, hCorr};
+            ret[2] = hCorr;
         }
-        else {
-            return new double[] {yCorr, xCorr, 0};
+        if (useTranslation) {
+            ret[0] = yCorr;
+            ret[1] = xCorr;
         }
+
+        return ret;
 
     }
 
