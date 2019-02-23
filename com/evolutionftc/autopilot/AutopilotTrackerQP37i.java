@@ -35,6 +35,7 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 	private double[] robotAttitude = new double[3];
 
 	private double[] sensorPosRelativeToRobot = new double[3];
+	private double[] negSensorPosRelativeToRobot = new double[3];
 
 
 	private static double[][] matmul(double[][] firstarray, double[][] secondarray) {
@@ -113,6 +114,9 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 		this.x = x;
 		this.y = y;
 		this.sensorPosRelativeToRobot = sensorPosRelativeToRobot;
+		for (int i = 0; i < 3; i++) {
+			negSensorPosRelativeToRobot[i] = -sensorPosRelativeToRobot[i];
+		}
 		this.imu = imu;
 		this.ticksPerUnit = ticksPerUnit;
 		this.nSubsteps = nSubsteps;
@@ -131,6 +135,9 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
 
 	public void update() {
+
+		// To sensor pos
+		robotPosition = transform(robotPosition, sensorPosRelativeToRobot, robotAttitude);
 
 		double[] oldRobotAttitude = new double[3];
 		oldRobotAttitude[0] = robotAttitude[0];
@@ -169,12 +176,8 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 			robotPosition = transform(robotPosition, translationDeltaPerStep, robotAttitudeThisStep);
 		}
 
-		// Sensor pos compensate
-
-		for (int i=0; i<3; i++) {
-			robotPosition[i] -= sensorPosRelativeToRobot[i];
-		}
-
+		// Back to actual robot pos
+		robotPosition = transform(robotPosition, negSensorPosRelativeToRobot, robotAttitude);
 	}
 
 	public double[] getRobotPosition() {
@@ -187,9 +190,6 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
 	public void setRobotPosition(double[] position) {
 		robotPosition = position;
-		for (int i=0; i<3; i++) {
-			robotPosition[i] += sensorPosRelativeToRobot[i];
-		}
 	}
 
 	public void setRobotAttitude(double[] attitude) {
