@@ -86,8 +86,6 @@ public class AutopilotHost {
     }
 
     public void communicate(AutopilotTracker tracker) {
-        tracker.setRobotAttitude(robotAttitude);
-        tracker.setRobotPosition(robotPosition);
         tracker.update();
 
         robotAttitude = tracker.getRobotAttitude();
@@ -152,12 +150,6 @@ public class AutopilotHost {
 
     public double[] getRobotPosition() {
         return robotPosition;
-    }
-
-    public void setRobotPosition(double[] position) {
-        robotPosition = position;
-
-        lastRobotPosition = null;
     }
 
     private static boolean hasReached(double param1, double param2, double threshold) {
