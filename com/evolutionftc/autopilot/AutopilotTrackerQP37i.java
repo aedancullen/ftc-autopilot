@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-public class AutopilotTrackerQP37i extends AutopilotTracker{
+public class AutopilotTrackerQP37i extends AutopilotTracker {
 
 	private DcMotor x;
 	private DcMotor y;
@@ -30,6 +30,8 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 	public BNO055IMU imu;
 
 	int nSubsteps;
+	
+	private double[] rao = new double[3];
 
 	private double[] robotPosition = new double[3];
 	private double[] robotAttitude = new double[3];
@@ -146,6 +148,11 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
 		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
 		robotAttitude[0] = angles.firstAngle;
+		robotAttitude[1] = 0;
+		robotAttitude[2] = 0;
+		for (int i = 0; i < 3; i++) {
+			robotAttitude[i] -= rao[i];
+		}
 
 		long ticksX = x.getCurrentPosition();
 		long ticksY = y.getCurrentPosition();
@@ -190,10 +197,14 @@ public class AutopilotTrackerQP37i extends AutopilotTracker{
 
 	public void setRobotPosition(double[] position) {
 		robotPosition = position;
+		xenc = x.getCurrentPosition();
+		yenc = y.getCurrentPosition();
 	}
 
 	public void setRobotAttitude(double[] attitude) {
-		robotAttitude = attitude;
+		for (int i = 0; i < 3; i++) {
+			rao[i] = robotAttitude[i] - attitude[i];
+		}
 	}
 
 }
