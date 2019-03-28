@@ -27,6 +27,8 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 	private BNO055IMU imu;
 
 	int nSubsteps;
+	
+	private double[] rao = new double[3];
 
 	private double[] robotPosition = new double[3];
 	private double[] robotAttitude = new double[3];
@@ -128,6 +130,11 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 
 		Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
 		robotAttitude[0] = angles.firstAngle;
+		robotAttitude[1] = 0;
+		robotAttitude[2] = 0;
+		for (int i = 0; i < 3; i++) {
+			robotAttitude[i] -= rao[i];
+		}
 
 		long ticksRight = right.getCurrentPosition();
 		long ticksLeft = left.getCurrentPosition();
@@ -166,10 +173,14 @@ public class AutopilotTrackerEnc extends AutopilotTracker{
 
 	public void setRobotPosition(double[] position) {
 		robotPosition = position;
+		xenc = x.getCurrentPosition();
+		yenc = y.getCurrentPosition();
 	}
 
 	public void setRobotAttitude(double[] attitude) {
-		robotAttitude = attitude;
+		for (int i = 0; i < 3; i++) {
+			rao[i] = robotAttitude[i] - attitude[i];
+		}
 	}
-
+	
 }
