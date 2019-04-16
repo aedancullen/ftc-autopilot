@@ -36,6 +36,7 @@ public class AutopilotHost {
     public double orientationMax;
     public boolean useOrientation;
     public boolean useTranslation;
+    public boolean fullStop;
 
     private double[] robotAttitude = new double[3];
 
@@ -102,7 +103,7 @@ public class AutopilotHost {
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
-        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.navigationGain, target.orientationGain, target.navigationMax, target.navigationMin, target.orientationMax, target.useOrientation, target.useTranslation);
+        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.navigationGain, target.orientationGain, target.navigationMax, target.navigationMin, target.orientationMax, target.useOrientation, target.useTranslation, target.fullStop);
     }
 
     private void applyOrientationTargetInvert() {
@@ -117,7 +118,7 @@ public class AutopilotHost {
         }
     }
 
-    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double navigationGain, double orientationGain, double navigationMax, double navigationMin, double orientationMax, boolean useOrientation, boolean useTranslation) {
+    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double navigationGain, double orientationGain, double navigationMax, double navigationMin, double orientationMax, boolean useOrientation, boolean useTranslation, boolean fullStop) {
         this.navigationTarget = navigationTarget;
         this.orientationTarget = orientationTarget;
         this.navigationGain = navigationGain;
@@ -127,6 +128,7 @@ public class AutopilotHost {
         this.orientationMax = orientationMax;
         this.useOrientation = useOrientation;
         this.useTranslation = useTranslation;
+        this.fullStop = fullStop;
 
         if (this.navigationTargetInverts != null) {
             this.applyNavigationTargetInverts();
@@ -234,6 +236,9 @@ public class AutopilotHost {
         }
 
 
+        if (!fullStop && nTimesStable > 0) {
+            navigationStatus = NavigationStatus.STOPPED;
+        }
         if (nTimesStable > countsToStable) {
             navigationStatus = NavigationStatus.STOPPED;
         }
