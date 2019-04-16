@@ -221,7 +221,7 @@ public class AutopilotHost {
         boolean boolReached = true;
 
         if (useOrientation) {
-            boolReached = boolReached && hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable);
+            boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
         if (useTranslation) {
             boolReached = boolReached && hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
