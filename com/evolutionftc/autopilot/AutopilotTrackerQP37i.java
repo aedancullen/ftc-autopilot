@@ -138,9 +138,6 @@ public class AutopilotTrackerQP37i extends AutopilotTracker {
 
 	public void update() {
 
-		// To sensor pos
-		robotPosition = transform(robotPosition, sensorPosRelativeToRobot, robotAttitude);
-
 		double[] oldRobotAttitude = new double[3];
 		oldRobotAttitude[0] = robotAttitude[0];
 		oldRobotAttitude[1] = robotAttitude[1];
@@ -153,6 +150,9 @@ public class AutopilotTrackerQP37i extends AutopilotTracker {
 		for (int i = 0; i < 3; i++) {
 			robotAttitude[i] -= rao[i];
 		}
+
+                // To sensor pos
+                robotPosition = transform(robotPosition, sensorPosRelativeToRobot, robotAttitude);
 
 		long ticksX = x.getCurrentPosition();
 		long ticksY = y.getCurrentPosition();
