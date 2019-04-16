@@ -66,18 +66,24 @@ public class AutopilotTrackerQP37i extends AutopilotTracker {
 		double p = hpr[1];
 		double r = hpr[2];
 
+                double sinh = Math.sin(h);
+                double cosh = Math.cos(h);
+                double sinp = Math.sin(p);
+                double cosp = Math.cos(p);
+                double sinr = Math.sin(r);
+                double cosr = Math.cos(r);
 
-		out[0][0] = Math.cos(h)*Math.cos(p);
-		out[0][1] = (Math.cos(h)*Math.sin(p)*Math.sin(r)) - (Math.sin(h)*Math.cos(r));
-		out[0][2] = (Math.cos(h)*Math.sin(p)*Math.cos(r)) + (Math.sin(h)*Math.sin(r));
+		out[0][0] = cosh*cosp;
+		out[0][1] = (cosh*sinp*sinr) - (sinh*cosr);
+		out[0][2] = (cosh*sinp*cosr) + (sinh*sinr);
 		out[0][3] = x;
-		out[1][0] = Math.sin(h)*Math.cos(p);
-		out[1][1] = (Math.sin(h)*Math.sin(p)*Math.sin(r)) + (Math.cos(h)*Math.cos(r));
-		out[1][2] = (Math.sin(h)*Math.sin(p)*Math.cos(r)) - (Math.cos(h)*Math.sin(r));
+		out[1][0] = sinh*cosp;
+		out[1][1] = (sinh*sinp*sinr) + (cosh*cosr);
+		out[1][2] = (sinh*sinp*cosr) - (cosh*sinr);
 		out[1][3] = y;
-		out[2][0] = -Math.sin(p);
-		out[2][1] = Math.cos(p)*Math.sin(r);
-		out[2][2] = Math.cos(p)*Math.cos(r);
+		out[2][0] = -sinp;
+		out[2][1] = cosp*sinr;
+		out[2][2] = cosp*cosr;
 		out[2][3] = z;
 		out[3][0] = 0.0;
 		out[3][1] = 0.0;
