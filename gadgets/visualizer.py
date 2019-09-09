@@ -5,10 +5,8 @@
 import turtle as t
 import math
 import subprocess
-import os
-import fcntl
 
-FIELD_FN = "field-grid.gif"
+FIELD_FN = "field-grid-basic.gif"
 FIELD_X = 500
 FIELD_Y = 500
 FIELD_SCALE = 500
@@ -63,37 +61,33 @@ def update(status, x, y, h):
     seth(h)
     t.setpos(itop(x), itop(y))
 
-    t.title(TITLE + status.upper())
+    t.title(TITLE + "nav " + status)
 
     last_status = status
     t.update()
 
 
 logcat = subprocess.Popen(["adb", "logcat"], stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout
-flag = fcntl.fcntl(logcat, fcntl.F_GETFL)
-fcntl.fcntl(logcat, fcntl.F_SETFL, flag | os.O_NONBLOCK)
 
 def check_logcat():
     global logcat
 
-    while True:
+    line = logcat.readline()
+    if not line:
+        return
+    if TAG in line:
         try:
-            line = os.read(logcat.fileno(), 1024)
-        except Exception as e:
-            t.ontimer(check_logcat, 15)
-            return
-        if TAG in line:
-            try:
-                line = line[line.find(TAG):]
-                line = line.split(b"\r\n")[0]
-                line = line.split(b" ")[1]
-                status, x, y, h = line.split(b",")
-                update(status, float(x),float(y),float(h))
-            except:
-                pass
+            line = line[line.find(TAG):]
+            line = line.rstrip([" ", "\r", "\n"])
+            line = line.split(b" ")[1]
+            status, x, y, h = line.split(b",")
+            update(status, float(x),float(y),float(h))
+            print("Got update: x="+x+" y="+y+" h="+h)
+        except:
+            pass
 
     t.ontimer(check_logcat, 15)
 
-
+print("Connected to logcat, press Ctrl-C to cancel waiting")
 t.ontimer(check_logcat, 15)
 t.mainloop()
