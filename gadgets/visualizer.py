@@ -61,12 +61,12 @@ def update(status, x, y, h):
     seth(h)
     t.setpos(itop(x), itop(y))
 
-    t.title(TITLE + "nav " + status)
+    t.title(TITLE + b"nav " + status)
 
     last_status = status
     t.update()
 
-
+subprocess.call(["adb", "logcat", "-c"])
 logcat = subprocess.Popen(["adb", "logcat"], stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout
 
 def check_logcat():
@@ -76,18 +76,14 @@ def check_logcat():
     if not line:
         return
     if TAG in line:
-        try:
-            line = line[line.find(TAG):]
-            line = line.rstrip([" ", "\r", "\n"])
-            line = line.split(b" ")[1]
-            status, x, y, h = line.split(b",")
-            update(status, float(x),float(y),float(h))
-            print("Got update: x="+x+" y="+y+" h="+h)
-        except:
-            pass
+        line = line[line.find(TAG):]
+        line = line.rstrip(b" \r\n")
+        line = line.split(b" ")[1]
+        status, x, y, h = line.split(b",")
+        update(status, float(x),float(y),float(h))
 
     t.ontimer(check_logcat, 15)
 
-print("Connected to logcat, press Ctrl-C to cancel waiting")
+print("Connected to logcat, press Ctrl-C to quit")
 t.ontimer(check_logcat, 15)
 t.mainloop()
