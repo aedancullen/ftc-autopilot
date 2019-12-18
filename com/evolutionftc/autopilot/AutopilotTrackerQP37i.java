@@ -211,6 +211,7 @@ public class AutopilotTrackerQP37i extends AutopilotTracker {
 		for (int i = 0; i < 3; i++) {
 			rao[i] = robotAttitude[i] - attitude[i];
 		}
+		robotAttitude = attitude;
 	}
 
 }

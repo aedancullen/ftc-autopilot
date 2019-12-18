@@ -34,9 +34,6 @@ public class AutopilotTrackerDualOdo extends AutopilotTracker {
     private double[] robotPosition = new double[3];
     private double[] robotAttitude = new double[3];
 
-    private double[] intersectPosRelativeToRobot = new double[3];
-    private double[] negIntersectPosRelativeToRobot = new double[3];
-
     private double xRadius;
     private double yRadius;
 
@@ -118,22 +115,13 @@ public class AutopilotTrackerDualOdo extends AutopilotTracker {
         return out;
     }
 
-
     //
-    // If you draw a vertical line through the horizontal-tracking odometer (x),
-    // and a horizontal line through the vertical-tracking odometer (y), then set
-    // intersectPosRelativeToRobot to the location of their intersection relative to robot center.
+    // Set xRadius to the offset in the y-direction of the x-encoder relative to the robot center
+    // Set yRadius to the offset in the x-direction of the y-encoder relative to the robot center
     //
-    // Set xRadius to the offset in the y-direction of the x-encoder relative to the intersection point
-    // Set yRadius to the offset in the x-direction of the y-encoder relative to the intersection point
-    //
-    public AutopilotTrackerDualOdo(DcMotor x, DcMotor y, double xRadius, double yRadius, double[] intersectPosRelativeToRobot, double ticksPerUnit, BNO055IMU imu) {
+    public AutopilotTrackerDualOdo(DcMotor x, DcMotor y, double xRadius, double yRadius, double ticksPerUnit, BNO055IMU imu) {
         this.x = x;
         this.y = y;
-        this.intersectPosRelativeToRobot = intersectPosRelativeToRobot;
-        for (int i = 0; i < 3; i++) {
-            negIntersectPosRelativeToRobot[i] = -intersectPosRelativeToRobot[i];
-        }
         this.imu = imu;
         this.ticksPerUnit = ticksPerUnit;
         this.xRadius = xRadius;
@@ -179,7 +167,9 @@ public class AutopilotTrackerDualOdo extends AutopilotTracker {
         if (invertX) {xval = -xval;}
         if (invertY) {yval = -yval;}
 
-        double dA = (robotAttitude[0] - oldRobotAttitude[0]) % (Math.PI/2);
+        double dA = (robotAttitude[0] - oldRobotAttitude[0]);
+        if (dA > Math.PI / 4) {dA = Math.PI * 2 - dA;}
+        if (dA < -Math.PI / 4) {dA = -Math.PI * 2 - dA;}
         // dA is positive for CCW rotation
         double error_xval = -(xRadius * dA); // X-odometer at a positive radius wil track negative (left)
         double error_yval = (yRadius * dA); // Y-odometer at a positive radius will track positive (up)
@@ -189,13 +179,7 @@ public class AutopilotTrackerDualOdo extends AutopilotTracker {
 
         double[] translationDelta = {xval, yval, 0.0};
 
-        // To intersect position
-        robotPosition = transform(robotPosition, intersectPosRelativeToRobot, robotAttitude);
-
         robotPosition = transform(robotPosition, translationDelta, robotAttitude);
-
-        // Back to actual robot position
-        robotPosition = transform(robotPosition, negIntersectPosRelativeToRobot, robotAttitude);
     }
 
     public double[] getRobotPosition() {
@@ -216,6 +200,7 @@ public class AutopilotTrackerDualOdo extends AutopilotTracker {
         for (int i = 0; i < 3; i++) {
             rao[i] = robotAttitude[i] - attitude[i];
         }
+        robotAttitude = attitude;
     }
 
 }
