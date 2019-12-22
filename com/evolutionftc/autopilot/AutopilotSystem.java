@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class AutopilotSystem {
 
-	private static final int VISUALIZER_BROADCAST_INTERVAL_MS = 250;
+	private static final int VISUALIZER_BROADCAST_INTERVAL_MS = 50;
 
 	private long msAtLastBroadcast;
 
