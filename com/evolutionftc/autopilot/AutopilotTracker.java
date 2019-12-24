@@ -7,16 +7,20 @@ public class AutopilotTracker {
         return new double[3];
     }
 
-    public double getRobotPositionRateMagnitude() {
+    public double getRateX() {
+        return 0;
+    }
+
+    public double getRateY() {
+        return 0;
+    }
+
+    public double getRateH() {
         return 0;
     }
 
     public double[] getRobotAttitude() {
         return new double[3];
-    }
-
-    public double getRobotAttitudeRate() {
-        return 0;
     }
 
     public void setRobotPosition(double[] position) {

@@ -42,25 +42,11 @@ public class AutopilotHost {
 
     private double[] robotPosition = new double[3];
 
-    // for translation velocity I-controller
-    private double robotPositionRateMagnitude;
-    private double positionPowerErrorIntegral;
-    private long positionDesiredPowerSetTime = -1;
-    private double positionDesiredPowerSet;
-    private double positionRateAtFull = 1; //dummy
-    private double positionKi;
-    //
-
     private boolean[] navigationTargetInverts = null;
     private boolean orientationTargetInvert = false;
 
     public AutopilotHost(Telemetry telemetry) {
         this.telemetry = telemetry;
-    }
-
-    public void setIntegralControlParams(double positionRateAtFull, double positionKi) {
-        this.positionRateAtFull = positionRateAtFull;
-        this.positionKi = positionKi;
     }
 
     public void setCountsToStable(int countsToStable) {
@@ -105,7 +91,6 @@ public class AutopilotHost {
 
         robotAttitude = tracker.getRobotAttitude();
         robotPosition = tracker.getRobotPosition();
-        robotPositionRateMagnitude = tracker.getRobotPositionRateMagnitude();
     }
 
     public NavigationStatus getNavigationStatus() {
@@ -116,8 +101,6 @@ public class AutopilotHost {
         this.navigationStatus = navigationStatus;
 
         lastRobotPosition = null;
-        positionPowerErrorIntegral = 0;
-        positionDesiredPowerSetTime = -1;
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
@@ -157,8 +140,6 @@ public class AutopilotHost {
         }
 
         lastRobotPosition = null;
-        positionPowerErrorIntegral = 0;
-        positionDesiredPowerSetTime = -1;
     }
 
     public double[] getNavigationTarget() {
@@ -231,24 +212,10 @@ public class AutopilotHost {
 
 
         double distance = Math.sqrt(Math.pow(xErr, 2) + Math.pow(yErr, 2));
-        double newDesiredPower = Math.max(navigationMin, Math.min(navigationMax, distance * navigationGain));
+        double chosenPower = Math.max(navigationMin, Math.min(navigationMax, distance * navigationGain));
 
-        // translation velocity I-controller
-        long timeNow = System.currentTimeMillis();
-        double adjustedPower = newDesiredPower;
-        if (positionDesiredPowerSetTime > 0) {
-            double positionPowerError = (robotPositionRateMagnitude/positionRateAtFull) - positionDesiredPowerSet;
-            positionPowerErrorIntegral += positionPowerError * (timeNow - positionDesiredPowerSetTime) /1000;
-            adjustedPower = newDesiredPower - (positionPowerErrorIntegral * positionKi);
-            // Don't inadvertently trigger zero-power behavior
-            if (adjustedPower == 0.0) {adjustedPower = 0.001;}
-        }
-        positionDesiredPowerSet = newDesiredPower;
-        positionDesiredPowerSetTime = timeNow;
-        //
-
-        double xCorr = adjustedPower * -Math.sin(finalAngle);
-        double yCorr = adjustedPower * Math.cos(finalAngle);
+        double xCorr = chosenPower * -Math.sin(finalAngle);
+        double yCorr = chosenPower * Math.cos(finalAngle);
 
 
         boolean boolReached = true;
@@ -283,8 +250,6 @@ public class AutopilotHost {
                 && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)) {
             xCorr = 0;
             yCorr = 0;
-            positionPowerErrorIntegral = 0;
-            positionDesiredPowerSetTime = -1;
         }
 
         if (hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable)) {
