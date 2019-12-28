@@ -7,15 +7,15 @@ public class AutopilotTracker {
         return new double[3];
     }
 
-    public double getRateX() {
+    public double getDeltaX() {
         return 0;
     }
 
-    public double getRateY() {
+    public double getDeltaY() {
         return 0;
     }
 
-    public double getRateH() {
+    public double getDeltaH() {
         return 0;
     }
 

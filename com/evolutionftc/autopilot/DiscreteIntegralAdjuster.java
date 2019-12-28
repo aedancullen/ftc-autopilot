@@ -12,16 +12,21 @@ public class DiscreteIntegralAdjuster {
         this.Ki = Ki;
     }
 
-    public double adjust(double desired, double actual) {
+    public double adjust(double desired, double actualDelta, double actualPeakRate) {
         long timeNow = System.currentTimeMillis();
+
         if (desired == 0) {
             integral = 0;
             timeAtLastTick = -1;
         }
         double output = desired;
         if (timeAtLastTick > 0) {
+
+            long elapsed = (timeNow - timeAtLastTick) / 1000;
+            double actual = (actualDelta / elapsed) / actualPeakRate;
+
             double error = actual - desiredAtLastTick;
-            integral += error * (timeNow - timeAtLastTick) /1000;
+            integral += error * elapsed;
             output -= integral * Ki;
         }
         timeAtLastTick = timeNow;
