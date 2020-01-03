@@ -31,6 +31,8 @@ public class DiscreteIntegralAdjuster {
         }
         timeAtLastTick = timeNow;
         desiredAtLastTick = desired;
+
+        if (output == 0) { output = 0.001; }
         return output;
     }
 }
