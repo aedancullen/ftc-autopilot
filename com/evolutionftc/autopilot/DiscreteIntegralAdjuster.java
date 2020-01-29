@@ -33,6 +33,6 @@ public class DiscreteIntegralAdjuster {
         desiredAtLastTick = desired;
 
         if (output == 0) { output = 0.001; }
-        return output;
+        return Math.max(-1.0, Math.min(1.0, output));
     }
 }
