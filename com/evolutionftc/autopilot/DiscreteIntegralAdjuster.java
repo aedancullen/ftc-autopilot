@@ -28,11 +28,11 @@ public class DiscreteIntegralAdjuster {
             double error = actual - desiredAtLastTick;
             integral += error * elapsed;
             output -= integral * Ki;
+            if (output == 0) { output = 0.001; }
         }
         timeAtLastTick = timeNow;
         desiredAtLastTick = desired;
 
-        if (output == 0) { output = 0.001; }
         return Math.max(-1.0, Math.min(1.0, output));
     }
 }
