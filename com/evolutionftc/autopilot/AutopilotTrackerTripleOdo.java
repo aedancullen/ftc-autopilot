@@ -22,8 +22,6 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
     long yencR;
     double ticksPerUnit;
 
-    private double[] rao = new double[3];
-
     private double[] robotPosition = new double[3];
     private double[] robotAttitude = new double[3];
 
@@ -165,9 +163,6 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
         robotAttitude[0] += dA;
         if (robotAttitude[0] < -Math.PI) {robotAttitude[0] += 2*Math.PI;}
         if (robotAttitude[0] > Math.PI) {robotAttitude[0] -= 2*Math.PI;}
-        for (int i = 0; i < 3; i++) {
-            robotAttitude[i] -= rao[i];
-        }
 
         robotPosition = transform(robotPosition, translationDelta, robotAttitude);
     }
@@ -182,15 +177,10 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
 
     public void setRobotPosition(double[] position) {
         robotPosition = position;
-        xenc = x.getCurrentPosition();
-        yencL = yL.getCurrentPosition();
-        yencR = yR.getCurrentPosition();
     }
 
     public void setRobotAttitude(double[] attitude) {
-        for (int i = 0; i < 3; i++) {
-            rao[i] = robotAttitude[i] - attitude[i];
-        }
+        robotAttitude = attitude;
     }
 
     public double getDeltaX() {
