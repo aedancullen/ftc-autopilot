@@ -192,5 +192,8 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
     public double getDeltaH() {
         return deltaH;
     }
+    public double getDeltaPos() {
+        return Math.sqrt(Math.pow(getDeltaX(), 2) + Math.pow(getDeltaY(), 2));
+    }
 
 }

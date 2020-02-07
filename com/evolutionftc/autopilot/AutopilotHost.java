@@ -38,6 +38,8 @@ public class AutopilotHost {
     public boolean useTranslation;
     public boolean fullStop;
 
+    PIDVelocityAdjuster chosenPowerAdjuster;
+
     private double[] robotAttitude = new double[3];
 
     private double[] robotPosition = new double[3];
@@ -47,6 +49,10 @@ public class AutopilotHost {
 
     public AutopilotHost(Telemetry telemetry) {
         this.telemetry = telemetry;
+    }
+
+    public void setupVelocityPID(double Kp, double Ki, double Kd, double actualPeakRate) {
+        chosenPowerAdjuster = new PIDVelocityAdjuster(Kp, Ki, Kd, actualPeakRate);
     }
 
     public void setCountsToStable(int countsToStable) {
@@ -101,6 +107,9 @@ public class AutopilotHost {
         this.navigationStatus = navigationStatus;
 
         lastRobotPosition = null;
+        if (chosenPowerAdjuster != null) {
+            chosenPowerAdjuster.reset();
+        }
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
@@ -140,6 +149,9 @@ public class AutopilotHost {
         }
 
         lastRobotPosition = null;
+        if (chosenPowerAdjuster != null) {
+            chosenPowerAdjuster.reset();
+        }
     }
 
     public double[] getNavigationTarget() {
@@ -186,8 +198,11 @@ public class AutopilotHost {
         return plainTargAngle - deviatedAngle;
     }
 
-
     public double[] navigationTick() {
+        return navigationTick(0);
+    }
+
+    public double[] navigationTick(double deltaPos) {
 
         if (navigationStatus == NavigationStatus.STOPPED) {
             return new double[3];
@@ -213,6 +228,10 @@ public class AutopilotHost {
 
         double distance = Math.sqrt(Math.pow(xErr, 2) + Math.pow(yErr, 2));
         double chosenPower = Math.max(navigationMin, Math.min(navigationMax, distance * navigationGain));
+
+        if (chosenPowerAdjuster != null) {
+            chosenPower = chosenPowerAdjuster.adjust(chosenPower, deltaPos);
+        }
 
         double xCorr = chosenPower * -Math.sin(finalAngle);
         double yCorr = chosenPower * Math.cos(finalAngle);

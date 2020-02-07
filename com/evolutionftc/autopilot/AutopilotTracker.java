@@ -19,6 +19,10 @@ public class AutopilotTracker {
         return 0;
     }
 
+    public double getDeltaPos() {
+        return 0;
+    }
+
     public double[] getRobotAttitude() {
         return new double[3];
     }
