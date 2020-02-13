@@ -36,11 +36,15 @@ public class PIDVelocityAdjuster {
             double actual = (actualDelta / elapsed) / actualPeakRate;
             double error = actual - desiredAtLastTick;
 
-            output -= error * Kp;
+            if (Kp != 0) {
+                output -= error * Kp;
+            }
 
-            integral += error * elapsed;
-            integral = Math.max(-desired, Math.min(1.0-desired, integral * Ki)) / Ki;
-            output -= integral * Ki;
+            if (Ki != 0) {
+                integral += error * elapsed;
+                integral = Math.max(-desired, Math.min(1.0 - desired, integral * Ki)) / Ki;
+                output -= integral * Ki;
+            }
 
             if (output == 0) { output = 0.001; }
         }
