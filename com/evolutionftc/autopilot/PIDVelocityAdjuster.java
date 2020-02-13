@@ -4,6 +4,7 @@ public class PIDVelocityAdjuster {
 
     long timeAtLastTick = -1;
     double desiredAtLastTick;
+    double outputAtLastTick;
 
     double integral;
     double Kp;
@@ -24,7 +25,7 @@ public class PIDVelocityAdjuster {
     }
 
     public double adjust(double desired, double actualDelta) {
-        long timeNow = System.currentTimeMillis();
+        long timeNow = System.nanoTime() / 1000000;
 
         if (desired == 0) {
             reset();
@@ -33,6 +34,9 @@ public class PIDVelocityAdjuster {
         if (timeAtLastTick > 0) {
 
             long elapsed = (timeNow - timeAtLastTick) / 1000;
+            if (elapsed == 0) { // "zero elapsed time", so ignore this tick (no update)
+                return Math.max(0.0, Math.min(1.0, outputAtLastTick));
+            }
             double actual = (actualDelta / elapsed) / actualPeakRate;
             double error = actual - desiredAtLastTick;
 
@@ -50,6 +54,7 @@ public class PIDVelocityAdjuster {
         }
         timeAtLastTick = timeNow;
         desiredAtLastTick = desired;
+        outputAtLastTick = output;
 
         return Math.max(0.0, Math.min(1.0, output));
     }
