@@ -5,6 +5,7 @@ public class PIDVelocityAdjuster {
     long timeAtLastTick = -1;
     double desiredAtLastTick;
     double outputAtLastTick;
+    double deltaDump;
 
     double integral;
     double Kp;
@@ -35,8 +36,13 @@ public class PIDVelocityAdjuster {
 
             long elapsed = (timeNow - timeAtLastTick) / 1000;
             if (elapsed == 0) { // "zero elapsed time", so ignore this tick (no update)
+                // Need to "dump" this delta to not lose it in the magic timewarp
+                deltaDump += actualDelta;
                 return Math.max(0.0, Math.min(1.0, outputAtLastTick));
             }
+            // elapsed != 0, so apply and reset the dump
+            actualDelta += deltaDump;
+            deltaDump = 0;
             double actual = (actualDelta / elapsed) / actualPeakRate;
             double error = actual - desiredAtLastTick;
 
