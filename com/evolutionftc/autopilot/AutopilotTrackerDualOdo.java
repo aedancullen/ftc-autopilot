@@ -192,8 +192,6 @@ public class AutopilotTrackerDualOdo extends AutopilotTracker {
 
     public void setRobotPosition(double[] position) {
         robotPosition = position;
-        xenc = x.getCurrentPosition();
-        yenc = y.getCurrentPosition();
     }
 
     public void setRobotAttitude(double[] attitude) {
