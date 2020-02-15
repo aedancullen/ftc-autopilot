@@ -231,6 +231,7 @@ public class AutopilotHost {
 
         if (chosenPowerAdjuster != null) {
             chosenPower = chosenPowerAdjuster.adjust(chosenPower, deltaPos);
+            Log.v("chosenPower", ""+ chosenPower);
         }
 
         double xCorr = chosenPower * -Math.sin(finalAngle);

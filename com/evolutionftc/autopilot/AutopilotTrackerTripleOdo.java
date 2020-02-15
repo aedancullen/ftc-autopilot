@@ -152,7 +152,7 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
         double dA = unitsTurn / yRadius;
 
         double error_xval = -(xRadius * dA); // X-odometer at a positive radius wil track negative (left)
-        xval -= error_xval;
+        //xval -= error_xval;
 
         double unitsTranslateY = (yLval + yRval) / 2.0;
         double unitsTranslateX = xval;
@@ -160,11 +160,14 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
         deltaX = unitsTranslateX; deltaY = unitsTranslateY; deltaH = dA;
 
         double[] translationDelta = new double[] {unitsTranslateX, unitsTranslateY, 0};
+        robotPosition = transform(robotPosition, new double[] {0, xRadius, 0}, robotAttitude);
+
         robotAttitude[0] += dA;
         if (robotAttitude[0] < -Math.PI) {robotAttitude[0] += 2*Math.PI;}
         if (robotAttitude[0] > Math.PI) {robotAttitude[0] -= 2*Math.PI;}
 
         robotPosition = transform(robotPosition, translationDelta, robotAttitude);
+        robotPosition = transform(robotPosition, new double[] {0, -xRadius, 0}, robotAttitude);
     }
 
     public double[] getRobotPosition() {
