@@ -37,6 +37,7 @@ public class AutopilotHost {
     public boolean useOrientation;
     public boolean useTranslation;
     public boolean fullStop;
+    public boolean diffMode;
 
     PIDVelocityAdjuster chosenPowerAdjuster;
 
@@ -106,14 +107,26 @@ public class AutopilotHost {
     public void setNavigationStatus(NavigationStatus navigationStatus) {
         this.navigationStatus = navigationStatus;
 
-        lastRobotPosition = null;
+        lastDistanceToTarget = -1;
         if (chosenPowerAdjuster != null) {
             chosenPowerAdjuster.reset();
         }
     }
 
     public void setNavigationTarget(AutopilotSegment target) {
-        setNavigationTarget(target.navigationTarget, target.orientationTarget, target.navigationGain, target.orientationGain, target.navigationMax, target.navigationMin, target.orientationMax, target.useOrientation, target.useTranslation, target.fullStop);
+        setNavigationTarget(
+                target.navigationTarget,
+                target.orientationTarget,
+                target.navigationGain,
+                target.orientationGain,
+                target.navigationMax,
+                target.navigationMin,
+                target.orientationMax,
+                target.useOrientation,
+                target.useTranslation,
+                target.fullStop,
+                target.diffMode
+        );
     }
 
     private void applyOrientationTargetInvert() {
@@ -128,7 +141,20 @@ public class AutopilotHost {
         }
     }
 
-    public void setNavigationTarget(double[] navigationTarget, double orientationTarget, double navigationGain, double orientationGain, double navigationMax, double navigationMin, double orientationMax, boolean useOrientation, boolean useTranslation, boolean fullStop) {
+    public void setNavigationTarget(
+            double[] navigationTarget,
+            double orientationTarget,
+            double navigationGain,
+            double orientationGain,
+            double navigationMax,
+            double navigationMin,
+            double orientationMax,
+            boolean useOrientation,
+            boolean useTranslation,
+            boolean fullStop,
+            boolean diffMode)
+    {
+
         this.navigationTarget = navigationTarget;
         this.orientationTarget = orientationTarget;
         this.navigationGain = navigationGain;
@@ -139,6 +165,7 @@ public class AutopilotHost {
         this.useOrientation = useOrientation;
         this.useTranslation = useTranslation;
         this.fullStop = fullStop;
+        this.diffMode = diffMode;
 
         if (this.navigationTargetInverts != null) {
             this.applyNavigationTargetInverts();
@@ -148,7 +175,7 @@ public class AutopilotHost {
             this.applyOrientationTargetInvert();
         }
 
-        lastRobotPosition = null;
+        lastDistanceToTarget = -1;
         if (chosenPowerAdjuster != null) {
             chosenPowerAdjuster.reset();
         }
@@ -175,27 +202,22 @@ public class AutopilotHost {
         return roundOff;
     }
 
+    double lastDistanceToTarget;
 
-    double lastTranslateTargAngle;
-    double[] lastRobotPosition;
-
-    private void updateLasts(double translateTargAngle) {
-        lastTranslateTargAngle = translateTargAngle;
-        lastRobotPosition = robotPosition;
+    private void updateLasts(double distanceToTarget) {
+        lastDistanceToTarget = distanceToTarget;
     }
 
-
-    private double compensateDeviations(double plainTargAngle) {
-        if (lastRobotPosition == null) {return plainTargAngle;}
-
-        double movedX = robotPosition[0] - lastRobotPosition[0];
-        double movedY = robotPosition[1] - lastRobotPosition[1];
-        if (movedX == 0 || movedY == 0) {return plainTargAngle;}
-        double movedAngle = -Math.tan(movedX / movedY);
-        if (movedY < 0) {movedAngle += Math.PI;}
-
-        double deviatedAngle = movedAngle - lastTranslateTargAngle;
-        return plainTargAngle - deviatedAngle;
+    private double[] applyDiff(double[] yxh) {
+        double[] output = new double[3];
+        output[0] = yxh[0];
+        if (yxh[0] > 0) {
+            output[2] = -yxh[1];
+        }
+        else {
+            output[2] = yxh[1];
+        }
+        return output;
     }
 
     public double[] navigationTick() {
@@ -231,7 +253,7 @@ public class AutopilotHost {
 
         if (chosenPowerAdjuster != null) {
             chosenPower = chosenPowerAdjuster.adjust(chosenPower, deltaPos);
-            Log.v("chosenPower", ""+ chosenPower);
+            //Log.v("chosenPower", ""+ chosenPower);
         }
 
         double xCorr = chosenPower * -Math.sin(finalAngle);
@@ -240,12 +262,11 @@ public class AutopilotHost {
 
         boolean boolReached = true;
 
-        if (useOrientation) {
+        if (useOrientation && !diffMode) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
         if (useTranslation) {
-            boolReached = boolReached && hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
-                    && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable);
+            boolReached = boolReached && hasReached(distance, 0, navigationUnitsToStable);
         }
 
         if (boolReached) {
@@ -256,7 +277,7 @@ public class AutopilotHost {
         }
 
 
-        if (!fullStop && nTimesStable > 0) {
+        if (!fullStop && (nTimesStable > 0)) {
             navigationStatus = NavigationStatus.STOPPED;
         }
         if (nTimesStable > countsToStable) {
@@ -264,26 +285,29 @@ public class AutopilotHost {
         }
 
 
-        updateLasts(translateTargAngle);
+        updateLasts(distance);
 
-        if (hasReached(robotPosition[0], navigationTarget[0], navigationUnitsToStable)
-                && hasReached(robotPosition[1], navigationTarget[1], navigationUnitsToStable)) {
+        if (hasReached(distance, 0, navigationUnitsToStable)) {
             xCorr = 0;
             yCorr = 0;
         }
 
-        if (hasReached(robotAttitude[0], orientationTarget, orientationUnitsToStable)) {
+        if (hasReached(hErr, 0, orientationUnitsToStable)) {
             hCorr = 0;
         }
 
         double[] ret = new double[3];
 
-        if (useOrientation) {
+        if (useOrientation && !diffMode) {
             ret[2] = hCorr;
         }
         if (useTranslation) {
             ret[0] = yCorr;
             ret[1] = xCorr;
+        }
+
+        if (diffMode) {
+            ret = applyDiff(ret);
         }
 
         return ret;
