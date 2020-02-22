@@ -31,6 +31,8 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
 
     private double xRadius;
     private double yRadius;
+    private double xTheta;
+    private double yTheta;
 
 
     private static double[][] matmul(double[][] firstarray, double[][] secondarray) {
@@ -111,9 +113,22 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
     }
 
     //
-    // Set xRadius to the offset in the y-direction of the x-encoder relative to the robot center
-    // Set yRadius to the offset in the x-direction of the y-encoders relative to the robot center (symmetric)
+    // Set xRadius to the position in the y-direction of the x-encoder relative to the robot center
+    // Set yRadius to the position in the x-direction of the y-encoders relative to the robot center (symmetric)
+    // Set xOffset to the position in the x-direction of the x-encoder relative to the robot center
+    // Set yOffset to the position in the y-direction of the y-encoders relative to the robot center (symmetric)
     //
+    public AutopilotTrackerTripleOdo(DcMotor x, DcMotor yL, DcMotor yR, double xRadius, double yRadius, double xOffset, double yOffset, double ticksPerUnit) {
+        this.x = x;
+        this.yL = yL;
+        this.yR = yR;
+        this.ticksPerUnit = ticksPerUnit;
+        this.xRadius = xRadius;
+        this.yRadius = yRadius;
+        this.xTheta = Math.atan(xOffset / xRadius);
+        this.yTheta = Math.atan(yOffset / yRadius);
+    }
+
     public AutopilotTrackerTripleOdo(DcMotor x, DcMotor yL, DcMotor yR, double xRadius, double yRadius, double ticksPerUnit) {
         this.x = x;
         this.yL = yL;
@@ -149,10 +164,10 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
         if (invertYR) {yRval = -yRval;}
 
         double unitsTurn = (yRval - yLval) / 2.0; // CCW rotation is positive
-        double dA = unitsTurn / yRadius;
+        double dA = (unitsTurn / Math.cos(yTheta)) / yRadius;
 
-        double error_xval = -(xRadius * dA); // X-odometer at a positive radius wil track negative (left)
-        //xval -= error_xval;
+        double error_xval = -(dA * xRadius * Math.cos(xTheta)); // X-odometer at a positive radius wil track negative (left)
+        xval -= error_xval;
 
         double unitsTranslateY = (yLval + yRval) / 2.0;
         double unitsTranslateX = xval;
@@ -160,14 +175,12 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
         deltaX = unitsTranslateX; deltaY = unitsTranslateY; deltaH = dA;
 
         double[] translationDelta = new double[] {unitsTranslateX, unitsTranslateY, 0};
-        robotPosition = transform(robotPosition, new double[] {0, xRadius, 0}, robotAttitude);
 
         robotAttitude[0] += dA;
         if (robotAttitude[0] < -Math.PI) {robotAttitude[0] += 2*Math.PI;}
         if (robotAttitude[0] > Math.PI) {robotAttitude[0] -= 2*Math.PI;}
 
         robotPosition = transform(robotPosition, translationDelta, robotAttitude);
-        robotPosition = transform(robotPosition, new double[] {0, -xRadius, 0}, robotAttitude);
     }
 
     public double[] getRobotPosition() {

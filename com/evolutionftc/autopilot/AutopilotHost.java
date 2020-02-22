@@ -108,6 +108,7 @@ public class AutopilotHost {
         this.navigationStatus = navigationStatus;
 
         lastDistanceToTarget = -1;
+        distanceDecreased = false;
         if (chosenPowerAdjuster != null) {
             chosenPowerAdjuster.reset();
         }
@@ -176,6 +177,7 @@ public class AutopilotHost {
         }
 
         lastDistanceToTarget = -1;
+        distanceDecreased = false;
         if (chosenPowerAdjuster != null) {
             chosenPowerAdjuster.reset();
         }
@@ -203,8 +205,12 @@ public class AutopilotHost {
     }
 
     double lastDistanceToTarget;
+    boolean distanceDecreased;
 
     private void updateLasts(double distanceToTarget) {
+        if (distanceToTarget < lastDistanceToTarget && lastDistanceToTarget != -1) {
+            distanceDecreased = true;
+        }
         lastDistanceToTarget = distanceToTarget;
     }
 
@@ -217,6 +223,7 @@ public class AutopilotHost {
         else {
             output[2] = yxh[1];
         }
+        output[2] *= orientationGain * (Math.PI / 2);
         return output;
     }
 
@@ -225,6 +232,10 @@ public class AutopilotHost {
     }
 
     public double[] navigationTick(double deltaPos) {
+        if (diffMode) {
+            fullStop = false;
+        }
+
 
         if (navigationStatus == NavigationStatus.STOPPED) {
             return new double[3];
@@ -262,10 +273,18 @@ public class AutopilotHost {
 
         boolean boolReached = true;
 
+        /*if (diffMode) {
+            if (lastDistanceToTarget != -1) {
+                boolReached = boolReached && (distanceDecreased && (distance > lastDistanceToTarget));
+            }
+            else {
+                boolReached = false;
+            }
+        }*/
         if (useOrientation && !diffMode) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
-        if (useTranslation) {
+        if (useTranslation && !diffMode) {
             boolReached = boolReached && hasReached(distance, 0, navigationUnitsToStable);
         }
 
@@ -277,10 +296,15 @@ public class AutopilotHost {
         }
 
 
-        if (!fullStop && (nTimesStable > 0)) {
+        boolean rapidStopSatisfied = false;
+        if (lastDistanceToTarget != -1) {
+            rapidStopSatisfied = (distanceDecreased && (distance > lastDistanceToTarget));
+        }
+
+        if (!fullStop && rapidStopSatisfied) {
             navigationStatus = NavigationStatus.STOPPED;
         }
-        if (nTimesStable > countsToStable) {
+        if (fullStop && nTimesStable > countsToStable) {
             navigationStatus = NavigationStatus.STOPPED;
         }
 
