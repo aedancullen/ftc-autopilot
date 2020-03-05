@@ -233,7 +233,7 @@ public class AutopilotHost {
 
     public double[] navigationTick(double deltaPos) {
         if (diffMode) {
-            fullStop = false;
+            useOrientation = false;
         }
 
 
@@ -273,18 +273,10 @@ public class AutopilotHost {
 
         boolean boolReached = true;
 
-        /*if (diffMode) {
-            if (lastDistanceToTarget != -1) {
-                boolReached = boolReached && (distanceDecreased && (distance > lastDistanceToTarget));
-            }
-            else {
-                boolReached = false;
-            }
-        }*/
-        if (useOrientation && !diffMode) {
+        if (useOrientation) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
-        if (useTranslation && !diffMode) {
+        if (useTranslation) {
             boolReached = boolReached && hasReached(distance, 0, navigationUnitsToStable);
         }
 
@@ -301,7 +293,7 @@ public class AutopilotHost {
             rapidStopSatisfied = (distanceDecreased && (distance > lastDistanceToTarget));
         }
 
-        if (!fullStop && rapidStopSatisfied) {
+        if (!fullStop && (rapidStopSatisfied || nTimesStable > 0)) {
             navigationStatus = NavigationStatus.STOPPED;
         }
         if (fullStop && nTimesStable > countsToStable) {
@@ -322,7 +314,7 @@ public class AutopilotHost {
 
         double[] ret = new double[3];
 
-        if (useOrientation && !diffMode) {
+        if (useOrientation) {
             ret[2] = hCorr;
         }
         if (useTranslation) {

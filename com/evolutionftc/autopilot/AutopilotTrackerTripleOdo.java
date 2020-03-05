@@ -152,7 +152,7 @@ public class AutopilotTrackerTripleOdo extends AutopilotTracker {
         long ticksYR = yR.getCurrentPosition();
 
         double xval = ((double)(ticksX - xenc) / ticksPerUnit);
-        double yLval = ((double)(ticksYL - yencL) / ticksPerUnit);
+        double yLval = ((double)(ticksYL - yencL) / (ticksPerUnit));
         double yRval = ((double)(ticksYR - yencR) / ticksPerUnit);
 
         xenc = ticksX;

@@ -179,7 +179,7 @@ public class AutopilotTrackerQuadOdo extends AutopilotTracker {
 
         double error_xval = -(dA * xRadius * Math.cos(xTheta)); // X-odometer at a positive radius wil track negative (left)
         xval -= error_xval;
-        x2val -= error_xval;
+        x2val += error_xval;
 
         double unitsTranslateY = (yLval + yRval) / 2.0;
         double unitsTranslateX = (xval + x2val) / 2.0;
