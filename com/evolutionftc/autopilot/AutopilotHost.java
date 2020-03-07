@@ -208,7 +208,7 @@ public class AutopilotHost {
     boolean distanceDecreased;
 
     private void updateLasts(double distanceToTarget) {
-        if (distanceToTarget < lastDistanceToTarget && lastDistanceToTarget != -1) {
+        if (distanceToTarget < lastDistanceToTarget && lastDistanceToTarget != -1 && lastDistanceToTarget < 9) {
             distanceDecreased = true;
         }
         lastDistanceToTarget = distanceToTarget;
