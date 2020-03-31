@@ -273,7 +273,7 @@ public class AutopilotHost {
 
         boolean boolReached = true;
 
-        if (useOrientation) {
+        if (useOrientation && fullStop) {
             boolReached = boolReached && hasReached(hErr, 0, orientationUnitsToStable);
         }
         if (useTranslation) {
