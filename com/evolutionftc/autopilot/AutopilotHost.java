@@ -176,6 +176,13 @@ public class AutopilotHost {
             this.applyOrientationTargetInvert();
         }
 
+        // only linear-rotation reset here
+        double xErr = navigationTarget[0] - robotPosition[0];
+        double yErr = navigationTarget[1] - robotPosition[1];
+        double distance = Math.sqrt(Math.pow(xErr, 2) + Math.pow(yErr, 2));
+        initialDistance = distance;
+        initialOrientation = robotAttitude[0];
+        
         lastDistanceToTarget = -1;
         distanceDecreased = false;
         if (chosenPowerAdjuster != null) {
@@ -204,6 +211,9 @@ public class AutopilotHost {
         return roundOff;
     }
 
+    double initialDistance;
+    double initialOrientation;
+    
     double lastDistanceToTarget;
     boolean distanceDecreased;
 
@@ -241,7 +251,8 @@ public class AutopilotHost {
             return new double[3];
         }
 
-        double hErr = Math.asin(Math.sin(orientationTarget - robotAttitude[0]));
+        double chosenOrientationTarget = initialOrientation + (1 - distance/initialDistance)*(orientationTarget-initialOrientation);
+        double hErr = Math.asin(Math.sin(chosenOrientationTarget - robotAttitude[0]));
         if (Math.cos(orientationTarget - robotAttitude[0]) < 0) {
             if (Math.sin(orientationTarget - robotAttitude[0]) > 0) {hErr = 2*Math.PI - hErr;} else {hErr = -2*Math.PI - hErr;}
         }
